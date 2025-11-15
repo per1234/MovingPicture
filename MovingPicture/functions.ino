@@ -118,6 +118,7 @@ void fillAllPos2(){
   }
   for(byte b=3;b<=5;b++){  //step through the position 2 program rows
       program[b][2] = offLevel;  //set current brightness
+      //program[b][3]=millis();  //set the last brightness change time
   }
 }
 
@@ -151,7 +152,7 @@ fader();  //the fader function changes brightness values to reach the target bri
 fader();  //I think more calls to the fader might make for smoother fades, the script() function doesn't need to update anywhere near as frequently
 //interruptLoadCheck()  //for debugging
 //sramCheck();  //for debugging
-debugBlink();  //for debugging
+//debugBlink();  //for debugging
 //millisBlink();  //for debugging
 }
 

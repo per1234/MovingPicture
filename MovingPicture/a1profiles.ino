@@ -21,9 +21,9 @@ const unsigned int strobeDelayMax=4000;  //the maximum time between strobes
 //const byte strobeIterationDelayMax;  //the minimum length of time between strobe pulses - not yet implemented
 const unsigned int fadeUpBackDelayMin=15000;  //this should be setup randomized eventually
 const unsigned int fadeUpBackDelayMax=35000;  //this should be setup randomized eventually
-const unsigned int allShiftRandomDelayMin=45000;  //this should be setup randomized eventually
-const unsigned int allShiftRandomDelayMax=65000;  //this should be setup randomized eventually
-const byte allShiftRandomMax=3;  //the maximum number of allShifts it will consecutively do before returning to the previous program
+const unsigned int allShiftRandomDelayMin=25000;  //this should be setup randomized eventually
+const unsigned int allShiftRandomDelayMax=45000;  //this should be setup randomized eventually
+const byte allShiftRandomMax=4;  //the maximum number of allShifts it will consecutively do before returning to the previous program
 const byte offLevel=8;  //with 256 brightness levels the jump from 0 to 1 is too dramatic and makes it blinky, with more brightness levels this could change
 
 void script(){
