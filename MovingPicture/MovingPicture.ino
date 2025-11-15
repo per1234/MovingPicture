@@ -1,8 +1,8 @@
 //#include <MemoryFree.h>  //for debugging this library checks available sram - uncomment the lastCheckTime line, the function call in loop(), and the function in the function tab also
 //#define __DEBUG_SOFTPWM__ 1  //for debugging - define this before including SoftPWM.h for printInterruptLoad() to work. - uncomment the lastCheckTime line, the function call in loop(), and the function in the function tab also
 //long lastCheckTime;  //for debugging the last time the interrupt load or sram was printed
-//long debugBlinkNextTime;  //the last time the debug blink happened
-//byte debugBlinkState;  //is the debug led on or off
+long debugBlinkNextTime;  //the last time the debug blink happened
+byte debugBlinkState;  //is the debug led on or off
 #include <arduino_softpwm_master.h>  //the softPWM library
 
 //pin/channel setup - map the softPWM channels to the port and bit of the pins the leds are connected to, these must be in rgb consecutive order for each RGBLED and if the number of channels are changed the SOFTPWM_DEFINE_OBJECT() and ledNum parameters must be updated also

@@ -2,10 +2,10 @@
 //uncomment the settings you want and leave the rest commented out
 
 //test profile
-const unsigned int fadeDelayMinSet = 5000;  //shortest shift time
-const unsigned int fadeDelayMaxSet = 18000;  //the longest time that it will color shift.
+const unsigned int fadeDelayMinSet = 7000;  //shortest shift time
+const unsigned int fadeDelayMaxSet = 20000;  //the longest time that it will color shift.
 const unsigned int fadeDelayDiffMin = 5000;  //the minimum difference in the range of fade speeds
-const unsigned int valueTotalMinMinSet = 32; //minimum sum of percentages of the RGB diodes of an LED. This avoids it picking too dim colors.
+const unsigned int valueTotalMinMinSet = 40; //minimum sum of percentages of the RGB diodes of an LED. This avoids it picking too dim colors.
 const unsigned int valueTotalMinMaxSet = 65; //minimum sum of percentages of the RGB diodes of an LED. This avoids it picking too dim colors.
 //const int valueDiffMinMinSet=15;  //the minimum bound of the randomly selected minimum change in value of each color. not yet implemented
 //const int valueDiffMinMaxSet=45;  //the maximum bound of the randomly selected minimum change in value of each color. not yet implemented
@@ -19,12 +19,12 @@ const unsigned int strobeDelayMax=4000;  //the maximum time between strobes
 //const byte strobeIterationsMax;  //the maximum number of strobe pulses each time it fires - not yet implemented
 //const byte strobeIterationDelayMin;  //the minimum length of time between strobe pulses - not yet implemented
 //const byte strobeIterationDelayMax;  //the minimum length of time between strobe pulses - not yet implemented
-const unsigned int fadeUpBackDelayMin=8000;  //this should be setup randomized eventually
-const unsigned int fadeUpBackDelayMax=10000;  //this should be setup randomized eventually
-const unsigned int allShiftRandomDelayMin=10000;  //this should be setup randomized eventually
-const unsigned int allShiftRandomDelayMax=18000;  //this should be setup randomized eventually
-const byte allShiftRandomMax=3;  //the maximum number of allShifts it will consecutively do before returning to the previous program - not implemented yet right now the minimum is 1
-const byte offLevel=5;  //with 256 brightness levels the jump from 0 to 1 is too dramatic and makes it blinky, with more brightness levels this could change
+const unsigned int fadeUpBackDelayMin=18000;  //this should be setup randomized eventually
+const unsigned int fadeUpBackDelayMax=21000;  //this should be setup randomized eventually
+const unsigned int allShiftRandomDelayMin=20000;  //this should be setup randomized eventually
+const unsigned int allShiftRandomDelayMax=38000;  //this should be setup randomized eventually
+const byte allShiftRandomMax=3;  //the maximum number of allShifts it will consecutively do before returning to the previous program
+const byte offLevel=8;  //with 256 brightness levels the jump from 0 to 1 is too dramatic and makes it blinky, with more brightness levels this could change
 
 void script(){
   //add-ons:

@@ -46,7 +46,7 @@ void fadeUpBack(){  //randomly fades all leds to full brightness and then choose
   if(programControl==0 || fadeUpBackStep>0){  //check if the main program has control, don't want to activate if another add-on has control
     if(millis()>=fadeUpBackNextTime && standardStep==1){  //start after the color shift on the standard script
       programControl=1;  //this takes control of the program from the main script
-      if(fadeUpBackStep==0){  //crossfade position 1 to position2
+      if(fadeUpBackStep==0){
         fadeUp();
       }
       if(fadeUpBackStep==1){
@@ -74,9 +74,9 @@ void allShiftRandom(){  //fades all leds up to a random color and then shifts th
 
 //script components:
 void allShiftOnce(){
-  if(millis()>= program[0][1]){  //check if the fade is complete
+  if(millis()>= program[0][1] && millis()>= program[3][1]){  //check if the fade is complete
     if(allShiftRandomStep==0){  //setup
-      allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift
+      allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift used only by the allShiftRandom add-on
       fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1
     }
     newColor(2);  //set new color for position 2
@@ -89,31 +89,31 @@ void allShiftOnce(){
   }
 }
 
-void colorShift(){
-  if(millis()>= program[0][1]){  //check if the previous program is complete
+void colorShift(){  //fades to a different color on position 2
+  if(millis()>= program[0][1] && millis()>= program[3][1]){  //check if the previous program is complete
     newColor(2);  //set new color for position 2
     standardStep=1;  //switch to the crossfade
-    //digitalWrite(10, HIGH);  //for debugging
+    digitalWrite(10, LOW);  //for debugging
   }
 }
 
-void crossFade(){
-  if(millis()>=program[3][1]){  //check if the previous program is complete
+void crossFade(){  //fades out position 1 and fades position 2 to a new color
+  if(millis()>= program[0][1] && millis()>=program[3][1]){  //check if the previous program is complete
     pos1equalsPos2();
     newPos2();  //new position 2
     newColor(2);  //new color on position 2
     for(byte i=3;i<=5;i++){
       program[i][2]=offLevel;  //set the current brightness level for position 2 to off
     }
-    fadeOut();  //fade postition 1 to offLevel
-    standardStep=0;  //switch back to the shift
-    //digitalWrite(10, LOW);  //for debugging
+    fadeOutPos1();  //fade postition 1 to offLevel
+    standardStep=0;  //switch back to the colorShift
+    digitalWrite(10, HIGH);  //for debugging
   }
 }
 
 void fadeUp(){  //set the target brightness to 255 for all leds and the fade end time to a random length of time
-  if(millis()>= program[0][1]){  //check if the fade is complete
-    //pos1equalsPos2();
+  if(millis()>= program[0][1] && millis()>= program[3][1]){  //check if the fade is complete
+    pos1equalsPos2();
     fillAllPos2();  //make sure all RGBLEDs are in position 1 or position 2
     fadeDelay=random(fadeDelayMin,fadeDelayMax);  //pick a length of time for the fadeUp
     for(byte b=0;b<=5;b++){  //step through the program rows
@@ -121,20 +121,22 @@ void fadeUp(){  //set the target brightness to 255 for all leds and the fade end
       program[b][1] = millis()+fadeDelay;  //set fade end time
     }
     fadeUpBackStep=1;
+    //digitalWrite(10, HIGH);  //for debugging
   } 
 }
 
 void fadeBack(){  //this picks new positions and a new color and fades one position to the new color and the other to 0
-  if(millis()>= program[0][1]){  //check if the fade is complete
-    newPos2();  //new position 2
-    pos1equalsPos2(); //fills position 1
-    fillAllPos2();  //new position 2 - this needs to take all the free pins
+  if(millis()>= program[0][1] && millis()>= program[3][1]){  //check if the fade is complete
+    //newPos2();  //new position 2
+    //pos1equalsPos2(); //fills position 1
+    //fillAllPos2();  //new position 2 - this needs to take all the free pins
     newColor(2);  //new color for position 2
-    fadeOut();  //fade out position 1
-    fadeUpBackNextTime=millis()+random(fadeUpBackDelayMin,fadeUpBackDelayMax);  //when the next fadeUpBack will occur
+    fadeOutPos1();  //fade out position 1
+    fadeUpBackNextTime=millis()+random(fadeUpBackDelayMin,fadeUpBackDelayMax)+fadeDelay;  //when the next fadeUpBack will occur
     fadeUpBackStep=0;  //reset for next time
     programControl=0;  //give the program control back to the main script
     standardStep=1;  //next step is the crossfade
+    //digitalWrite(10, LOW);  //for debugging
   } 
 }
 
@@ -181,11 +183,11 @@ void strobeOff(){
   }
 }
 
-void fadeOut(){ //sets position 1 brightness to 1, make sure to do a newColor() or otherwise set the fadeDelay first
+void fadeOutPos1(){ //sets position 1 brightness to 1, make sure to do a newColor() or otherwise set the fadeDelay first
   for(byte t=0;t<=2;t++){
     program[t][0]=offLevel;  //update the position 1 end brightness(0)
     program[t][1]=millis()+fadeDelay;  //update the position 1 end time
-    program[t][3]=millis();  //update the lact brightness change time
+    program[t][3]=millis();  //update the last brightness change time
   }
 }
   

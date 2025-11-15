@@ -1,7 +1,7 @@
 void setup(){
   randomSeed(analogRead(0));  //makes the pseudorandom number sequence start at a different position each boot - this needs a more random input
   //Serial.begin(9600);  //for debugging
-  SoftPWM.begin(120);  //start the SoftPWM and set the PWM frequency
+  SoftPWM.begin(100);  //start the SoftPWM and set the PWM frequency - if the frequency is a little too high then there is some brightness fluctuation noticeable at lower brightness levels, too low will be noticeable pwm period, way too high causes unpredictable behavior
   for(byte softPWMchannel=0;softPWMchannel<=SoftPWM.size();softPWMchannel++){  //cycle through all the softPWM channels
     SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at the offLevel right from the start - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
   }
@@ -174,7 +174,7 @@ void sramCheck(){  //turns on led if there is less than the set value of free sr
 }
 */
 
-/*
+
 void debugBlink(){  //blinks pin 13
   if(millis()>=debugBlinkNextTime){
     if (debugBlinkState==0){
@@ -188,7 +188,7 @@ void debugBlink(){  //blinks pin 13
     }
   }
 }
-*/
+
 
 /*
 void millisBlink(){
