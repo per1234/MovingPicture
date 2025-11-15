@@ -16,9 +16,9 @@ const long strobeDelayMin=100;  //the minimum time between strobes
 const long strobeDelayMax=2000;  //the maximum time between strobes
 const int fadeUpBackDelayMin=8000;  //this should be setup randomized eventually
 const int fadeUpBackDelayMax=10000;  //this should be setup randomized eventually
-//const int allShiftRandomDelayMin=8000;  //this should be setup randomized eventually
-//const int allShiftRandomDelayMax=18000;  //this should be setup randomized eventually
-//const byte allShiftRandomMax=4;  //the maximum number of allShifts it will consecutively do before returning to the previous program - not implemented yet
+const int allShiftRandomDelayMin=8000;  //this should be setup randomized eventually
+const int allShiftRandomDelayMax=18000;  //this should be setup randomized eventually
+const byte allShiftRandomMax=4;  //the maximum number of allShifts it will consecutively do before returning to the previous program - not implemented yet right now the minimum is 1
 const byte scriptID=0;
 
 /*

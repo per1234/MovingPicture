@@ -36,6 +36,12 @@ int fadeDelayMax;  //this is randomly set in the initialize function
 int fadeDelayMin;  //this is randomly set in the initialize function
 int valueTotalMin;  //this is randomly set in the initialize function
 long strobeOffTime;  //the length of time the strobe is on
-byte strobeFlag;  //is the strobe on or off flag
+byte strobeStep;  //is the strobe on or off flag
 long strobeNextTime;  //the time until the next strobe;
 long fadeUpBackNextTime;  //the next time to do a fadeUpBack
+byte programControl;  //flag to disable the main script while an addon script is in control of the program
+byte standardStep;  //the step the standard() scriptlet is currently in
+byte fadeUpBackStep;  //the step the fadeUpBack() function is currently in
+long allShiftRandomNextTime;  //the next time the allShiftRandom add-on scriptlet will run
+byte allShiftRandomStep;  //the current step of the allShiftRandom add-on scriptlet
+byte allShiftRandomTimes;  //the number of times the current allShiftRandom will color shift
