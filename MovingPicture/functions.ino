@@ -15,46 +15,28 @@ void setup(){
   fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);  //the maximum bound of the rendomly chosen length of time that the fade will occur over
   fadeDelayMin=random(fadeDelayMinSet, fadeDelayMax - fadeDelayDiffMin);  //the minimum bound of the rendomly chosen length of time that the fade will occur over
   valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet)*(SoftPWM.brightnessLevels()-1)*3/100;  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on - converts from a percent to a this should be set up to work with different numbers of brightness levels
-  //new position 2 - replace with newPos function
-  pos2size=random(0,SoftPWM.size()/3-2);  //chose how many RGBs will be in the new postition
-  for(byte n=0;n<=pos2size;n++){  //step through to fill the new position
-    pos2[n]=random(0,SoftPWM.size()/3);  //chose the RGB to add to the new postition
-    for(byte m=0;m<=pos1size;m++){  //make sure the led isn't already in position 1
-      while(pos2[n]==pos1[m]){  //make sure the led isn't already in position 1
-        pos2[n]=random(0,SoftPWM.size()/3);  //it was already in position 1, try again
-        m=0;  //restart the for loop and recheck to see if the new led number is already in position 1
-        for(byte o=0;o<=n-1;o++){  //make sure the led isn't already in pos2
-          while(pos2[o]==pos2[n]){  //make sure the led isn't already in pos2
-            pos2[n]=random(0,SoftPWM.size()/3);  //it was already in position 2, try again
-            m=0;  //restart the for loop and recheck to see if the new led number is already in position 1
-            o=0;  //restart the for loop and recheck to see if the new led number is already in position 2
-          }
-        }
-      }
-    }
-  }
+  newPos();
 }
 
 void newColor(byte positionID){  //set the new color program for the given position
-    fadeDelay = random(fadeDelayMin,fadeDelayMax);  //pick the end time for the fade to the new color
-    byte valueRb=random(1,SoftPWM.brightnessLevels());  //pick new brightness values for the position, the minimum is 1 because I want all the leds to stay barely on always to avoid blinkyness - the values might be better in an array
-    byte valueGb=random(1,SoftPWM.brightnessLevels());
-    byte valueBb=random(1,SoftPWM.brightnessLevels());
-    while(valueRb+valueGb+valueBb<valueTotalMin){  //make sure the brightness is greater than the minimum value
-      valueRb=random(1,SoftPWM.brightnessLevels());
-      valueGb=random(1,SoftPWM.brightnessLevels());
-      valueBb=random(1,SoftPWM.brightnessLevels());
+  fadeDelay = random(fadeDelayMin,fadeDelayMax);  //pick the end time for the fade to the new color
+  byte newColorArray[3];
+  for(byte e=0;e<=2;e++){
+    newColorArray[e]=random(1,SoftPWM.brightnessLevels());  //pick random brightness values for R, G, and B
+  }
+  while(newColorArray[0]+newColorArray[1]+newColorArray[2]<valueTotalMin){  //make sure the brightness is greater than the minimum value
+    for(byte e=0;e<=2;e++){
+      newColorArray[e]=random(1,SoftPWM.brightnessLevels());  //pick new values
     }
-    program[0+(positionID-1)*3][0]=valueRb;  //update the end brightness
-    program[1+(positionID-1)*3][0]=valueGb;    
-    program[2+(positionID-1)*3][0]=valueBb;   
-    program[0+(positionID-1)*3][1]=millis()+fadeDelay;  //update the end time
-    program[1+(positionID-1)*3][1]=millis()+fadeDelay;      
-    program[2+(positionID-1)*3][1]=millis()+fadeDelay;
+  }
+  for(byte e=0;e<=2;e++){
+    program[e+(positionID-1)*3][0]=newColorArray[e];  //update the end brightness
+    program[e+(positionID-1)*3][1]=millis()+fadeDelay;  //update the end time
+  }
 }
 
 void standard(){  //shift/crossfade
-    if(programStep==1){  //position one color shift
+  if(programStep==1){  //position one color shift
     colorShift();
   }
   if(programStep==2){  //crossfade position 1 to position2
@@ -89,60 +71,58 @@ void strobe(){  //randomly turns all leds on full and then back to the previous 
 void allShiftRandom(){  //fades all leds up to a random color and then shifts the color of all leds a random number of times, then picks new positions and new colors for position 1 and fades to the color on position 1 and to 0 on position 2 and then goes to crossfade
 }
 
-void newPos(byte posID){  //chooses the size of the new position and which pins are in it
+void newPos(){  //chooses the size of the new position and which pins are in it
 //copy old position 2 to position 1 and get the new postition 2
-}
+  pos2size=random(0,SoftPWM.size()/3-pos1size); //new position 2
+  for(byte i=0;i<=pos2size;i++){
+    pos2[i]=random(0,SoftPWM.size()/3);  
+    for(byte j=0;j<=pos1size;j++){  //make sure the led isn't already in position 1
+      while(pos2[i]==pos1[j]){
+        pos2[i]=random(0,SoftPWM.size()/3);
+        j=0;  //restart the for loop and recheck to see if the new led number is already in position 1
+        for(byte k=0;k<=i-1;k++){  //make sure the led isn't already in pos2
+          while(pos2[k]==pos2[i]){
+            pos2[i]=random(0,SoftPWM.size()/3);
+            j=0;  //restart the for loop and recheck to see if the new led number is already in position 1
+            k=0;  //restart the for loop and recheck to see if the new led number is already in position 2
+          }
+        }
+      }
+    }
+  }
+  for(byte i=3;i<=5;i++){
+    program[i][2]=1;  //update the position 2 current brightness(1)
+    program[i][3]=millis();  //update the position 2 last change time
+    
 
-void colorShift(){
-  if(millis()>= program[3][1]){  //check if the fade for position 2 is complete
     for(byte k=0;k<=pos2size;k++){  //START position1 = position2
       pos1[k]=pos2[k];  
     }
     pos1size=pos2size;
-    for(byte k=2;k<=3;k++){
-      program[0][k]=program[3][k];  //copy current brightness and last brightness change time from position 1 to position 2
-      program[1][k]=program[4][k];        
-      program[2][k]=program[5][k];
+    for(byte k=0;k<=2;k++){
+      program[k][2]=program[k+3][2];  //copy current brightness and last brightness change time from position 1 to position 2
+      program[k][3]=program[k+3][3];        
     }  //END position1=position2
-    newColor(1);  //set new color for position 1
+    
+  }
+}
+
+void colorShift(){
+  if(millis()>= program[0][1]){  //check if the previous program is complete
+    newColor(2);  //set new color for position 1
     programStep=2;  //switch to the crossfade
     //digitalWrite(13, HIGH);  //for debugging
   }
 }
 
 void crossFade(){
-  if(millis()>=program[0][1]){  //check if the color shift for position 1 is complete  
-    pos2size=random(0,SoftPWM.size()/3-pos1size); //new position 2
-    for(byte n=0;n<=pos2size;n++){
-      pos2[n]=random(0,SoftPWM.size()/3);  
-      for(byte m=0;m<=pos1size;m++){  //make sure the led isn't already in position 1
-        while(pos2[n]==pos1[m]){
-          pos2[n]=random(0,SoftPWM.size()/3);
-          m=0;  //restart the for loop and recheck to see if the new led number is already in position 1
-          for(byte o=0;o<=n-1;o++){  //make sure the led isn't already in pos2
-            while(pos2[o]==pos2[n]){
-              pos2[n]=random(0,SoftPWM.size()/3);
-              m=0;  //restart the for loop and recheck to see if the new led number is already in position 1
-              o=0;  //restart the for loop and recheck to see if the new led number is already in position 2
-            }
-          }
-        }
-      }
-    }
+  if(millis()>=program[0][1]){  //check if the previous program is complete
+    newPos();  //new position 2
     newColor(2);  //new color on position 2
-    program[3][2]=1;  //update the position 2 current brightness(0)
-    program[4][2]=1;    
-    program[5][2]=1;
-    program[3][3]=millis();  //update the position 2 last change time
-    program[4][3]=millis();      
-    program[5][3]=millis();
- 
-    program[0][0]=1;  //update the position 1 end brightness(0)
-    program[1][0]=1;    
-    program[2][0]=1;
-    program[0][1]=millis()+fadeDelay;  //update the position 1 end time
-    program[1][1]=millis()+fadeDelay;      
-    program[2][1]=millis()+fadeDelay;
+    for(byte t=0;t<=2;t++){
+      program[t][0]=1;  //update the position 1 end brightness(0)
+      program[t][1]=millis()+fadeDelay;  //update the position 1 end time
+    }
     programStep=1;  //switch back to the shift
 //      digitalWrite(13, LOW);  //for debugging
   }
@@ -164,8 +144,8 @@ void fadeUp(){  //set the target brightness to 255 for all leds and the fade end
 }
 void fadeBack(){  //this picks new positions and a new color and fades one position to the new color and the other to 0
   if(millis()>= program[3][1]){  //check if the fade for position 2 is complete
-    newPos(2);
-    newPos(1);
+//    newPos(2);
+//    newPos(1);
     newColor(1);  //new color for position 1
     for(byte b=3;b<=5;b++){  //step through the position 2 rows
       program[b][0] = 1;  //set target brightness 
@@ -254,7 +234,8 @@ script(scriptID);  //the script function runs the collection of functions in the
 fader();  //the fader function changes brightness values to reach the target brightness in the program by the end time for the fade
 //interruptLoadCheck()  //for debugging
 //sramCheck();  //for debugging
-//debugBlink();
+//debugBlink();  //for debugging
+//millisBlink();  //for debugging
 }
 
 /*
@@ -292,6 +273,14 @@ void debugBlink(){  //blinks pin 13
       debugBlinkNextTime=millis()+500;
       debugBlinkState=0;
     }
+  }
+}
+*/
+
+/*
+void millisBlink(){
+  if(millis()>=32000){
+    digitalWrite(13, HIGH);
   }
 }
 */
