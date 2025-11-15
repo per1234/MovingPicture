@@ -5,7 +5,7 @@
 //byte debugBlinkState;  //is the debug led on or off
 #include <arduino_softpwm_master.h>  //the softPWM library
 
-//pin/channel setup - map the softPWM channels to the port and bit of the pins the leds are connected to, these must be in rgb consecutive order for each RGB LED and if the number of channels are changed the SOFTPWM_DEFINE_OBJECT() and ledNum parameters must be updated also
+//pin/channel setup - map the softPWM channels to the port and bit of the pins the leds are connected to, these must be in rgb consecutive order for each RGBLED and if the number of channels are changed the SOFTPWM_DEFINE_OBJECT() and ledNum parameters must be updated also
 /*pro mini setup:
 SOFTPWM_DEFINE_CHANNEL_INVERT( 0, DDRD, PORTD, PORTD0 );  //D0
 SOFTPWM_DEFINE_CHANNEL_INVERT( 1, DDRD, PORTD, PORTD1 );  //D1
@@ -78,7 +78,8 @@ unsigned int valueTotalMin;  //this is randomly set in the initialize function
 byte programControl;  //flag to disable the main script while an addon script is in control of the program
 byte standardStep=1;  //the step the standard() script is currently in
 byte strobeStep;  //is the strobe on or off flag
-unsigned long strobeNextTime;  //the time until the next strobe;
+unsigned long strobeNextTime;  //the length of time until the next strobe action;
+byte strobeTime;  //the length of time the strobe is on;
 byte fadeUpBackStep;  //the step the fadeUpBack() function is currently in
 unsigned long fadeUpBackNextTime;  //the next time to do a fadeUpBack
 byte allShiftRandomStep;  //the current step of the allShiftRandom add-on script

@@ -26,9 +26,9 @@
   -moving position strobe where each strobe pulse is different random consecutive RGBLEDs - this will be less bright
 
 -bugs:
-  -the "off" leds in position1?(could be ones not in a position) have a brightness fluctuation at the very start
-  -leds start at 0(not zeroLEvel) with strobe addon
-  -allShift locks up after a while
+  -fadeUpBack locks up
+  -allShiftRandom locks up
+  -brightness fluctuations
   
 -maybe
   -create a stripped down version of the softPWM library and see if it will change memory usage

@@ -18,18 +18,13 @@ void allShift(){  //color shifts all leds simultaneously to random colors this w
   }
 }
 
-void strobeMain(){  //sets the brightness levels to 0 for the maximum strobe only effect add color option - apparently the add-on does the same exact thing so I can probably get rid of this function?
+void strobeMain(){  //sets the brightness levels to 0 for the maximum strobe only effect add color option
   if(programControl==0 || strobeStep>0){  //check if the main program has control, don't want to activate if another add-on has control
     if(strobeStep==0){
-      //fillAllPos();
-      for(byte i=0;i<=5;i++){  //this is not ideal to set all the variables every time
-        program[i][2]=0;
-      }
       strobeOn();
-      offLevel=0;
     }
     if(strobeStep==1){
-      strobeOff();
+      strobeOffFull();
     }
   }
 }
@@ -147,19 +142,20 @@ void fadeBack(){  //this picks new positions and a new color and fades one posit
   } 
 }
 
-void strobeOn(){  //this needs to save the program array in a different array and then set the program to full on and then after the strobeTime set it back to the original program array with strobeTime added to all end and last times in the array
-  if(millis()>=strobeNextTime){  //turn on the strobe
-    for(byte i=0;i<=5;i++){    //step through the RGB for position 1 and 2
-      lastTargetBrightness[i]=program[i][0];  //save the current program - I only need to save target brightness for the 6 rows
+void strobeOn(){
+  if(millis()>=strobeNextTime){  //time to turn on the strobe
+    for(byte i=0;i<=5;i++){    //step through the program rows for position 1 and 2
+      lastTargetBrightness[i]=program[i][0];  //save the target brightness for the 6 rows
       //Serial.println(program[i][0]);
-      program[i][0]=program[i][2];  //set the target brightness to the current brightness so the fader will not change brightness while the strobe is on
+      program[i][0]=program[i][2];  //set the target brightness to the current brightness to disable the fader while the strobe is on
     }
     for(byte i=0;i<SoftPWM.size();i++){  //turn them all on
       SoftPWM.set(i,SoftPWM.brightnessLevels()-1);
     }
     programControl=1;  //this takes control of the program from the main script
-    strobeStep=1;  //next step is strobeOff
-    strobeNextTime=millis()+random(strobeTimeMin,strobeTimeMax);  //randomly choose how long the strobe will be on
+    strobeStep=1;  //next step is strobeOff/strobeOffFull
+    strobeTime=random(strobeTimeMin,strobeTimeMax);  //chose the lenth of time the strobe will be on
+    strobeNextTime=millis()+strobeTime;
   }
 }
 
@@ -169,7 +165,7 @@ void strobeOffFull(){  //turns the pins all off to 0 for use with the strobeMain
       SoftPWM.set(i,0);
     }
     strobeStep=0;  //reset for next time
-    programControl=0;  //give control back to the main script    
+    programControl=0;  //give control back to the main script
     strobeNextTime=millis()+random(strobeDelayMin,strobeDelayMax);  //randomly choose the next time it will strobe
   }
 }
@@ -177,10 +173,11 @@ void strobeOffFull(){  //turns the pins all off to 0 for use with the strobeMain
 void strobeOff(){
   if(millis()>=strobeNextTime){
     for(byte i=0;i<=5;i++){    //step through the RGB for position 1 and 2
-      program[i][0]=lastTargetBrightness[i];  //reset the program to the pre-strobe values - this would be better if it added the strobetime to the end time but that will require another long
+      program[i][0]=lastTargetBrightness[i];  //reset the program to the pre-strobe values
+      program[i][1]=program[i][1]+strobeTime;  //add on the length of time the strobe was on to the fade end time in the program
     //Serial.println(program[row][0]);
     }
-    setter();
+    setter();  //set all leds back to their previous brightness
     strobeStep=0;  //reset for next time
     programControl=0;  //give control back to the main script    
     strobeNextTime=millis()+random(strobeDelayMin,strobeDelayMax);  //randomly choose the next time it will strobe

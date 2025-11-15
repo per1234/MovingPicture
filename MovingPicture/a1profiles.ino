@@ -24,15 +24,15 @@ const unsigned int fadeUpBackDelayMax=10000;  //this should be setup randomized 
 const unsigned int allShiftRandomDelayMin=10000;  //this should be setup randomized eventually
 const unsigned int allShiftRandomDelayMax=18000;  //this should be setup randomized eventually
 const byte allShiftRandomMax=3;  //the maximum number of allShifts it will consecutively do before returning to the previous program - not implemented yet right now the minimum is 1
-byte offLevel=3;  //with 256 brightness levels the jump from 0 to 1 is too dramatic and makes it blinky, with more brightness levels this could change this is not a constant because the strobeMain changes it
+const byte offLevel=3;  //with 256 brightness levels the jump from 0 to 1 is too dramatic and makes it blinky, with more brightness levels this could change
 
 void script(){
-  standard();
-  //fadeUpBack();
-  //allShiftRandom();
-  //strobeMain();
-  //strobe();
-  //allShift();
+  standard();  //works
+  //fadeUpBack();  //locks up
+  //allShiftRandom();  //locks up
+  //strobeMain();  //works
+  //strobe();  //works
+  //allShift();  //works
 }
 
 /*
