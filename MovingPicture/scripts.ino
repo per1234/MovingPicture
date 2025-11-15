@@ -87,7 +87,6 @@ void allShiftOnce(){
         fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1
       }
       newColor(2);  //set new color for position 2
-//            newColor(1);  //set new color for position 2
       for(byte i=0;i<=2;i++){  //copy over the new program from position 2 to position 1
         for(byte j=0;j<=1;j++){
           program[i][j]=program[i+3][j];
