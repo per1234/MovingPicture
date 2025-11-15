@@ -33,6 +33,7 @@ void newColor(byte positionID){  //set the new color program for the given posit
 }
 
 void setter(){  //sets the RGBLEDs to their current program values - currently used for recovery from the strobe() add-on
+  byte setterFlag;
   for(byte i=0;i<=2;i++){
     for(byte j=0;j<=pos1size;j++){
       SoftPWM.set(pos1[j]*3+i, program[i][2]);
@@ -44,7 +45,6 @@ void setter(){  //sets the RGBLEDs to their current program values - currently u
     }
   }
   for(byte i=0;i<SoftPWM.size()/3;i++){  //step through all RGBLEDs to see if any are not in a position
-    byte setterFlag;
     for(byte j=0;j<=pos1size;j++){
       if(i==pos1[j]){  
         setterFlag=1;  //already in a position

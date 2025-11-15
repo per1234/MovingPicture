@@ -18,7 +18,7 @@ void allShift(){  //color shifts all leds simultaneously to random colors this w
   }
 }
 
-void strobeMain(){  //sets the brightness levels to 0 for the maximum strobe only effect add color option - unless I can make it compatible with the add-ons better to just have a simple sketch with delay and digitalWrite
+void strobeMain(){  //sets the brightness levels to 0 for the maximum strobe only effect add color option - apparently the add-on does the same exact thing so I can probably get rid of this function?
   if(programControl==0 || strobeStep>0){  //check if the main program has control, don't want to activate if another add-on has control
     if(strobeStep==0){
       //fillAllPos();
