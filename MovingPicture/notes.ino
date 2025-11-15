@@ -1,4 +1,5 @@
 /*
+-store all of the setup variable values and functions included in the loop in an arrays and then I can have a tab of different profiles, then the setup will be just to specify a profile id number
 -many of the setup variables could be unsigned int to allow for a wider range of settings
 -solve flicker?
   -try to make it repeatable - all leds on?
@@ -9,7 +10,7 @@
 -check interrupt load at various point in the sketch
   -max pwm frequency without overloading the interrupt
 -smooth fade - the fade is way too fast at the start of the fade
-  -need more brightness levels but the softPWM only wants to do 256
+  -need more brightness levels but the softPWM only wants to do 256 - I have the new color values in bytes also now so they need to be changed to int if it is increased
   -the lowest brightness 1/3? of the fade will be at a slower speed and the fade determiner needs to be adjusted to account for this so that it will still reach the target
   -there needs to be a modifier on the fade speed that is 1 at the midpoint, less than 1 by a configurable percent before the midpoint of the fade and greater than 1 by the same amount after the midpoint of the fade, this way the fade will end up taking the same amount of time to get to the target 
 -check the millis() overflow(I'm using long instead of unsigned long in the program) and make it overflow friendly
@@ -49,4 +50,5 @@
   -use internal thermometer(secret thermometer library?) to have a safety cutoff if it gets too hot
   -burn sketch with external programmer with no bootloader on the chip for more memory and faster boot
   -PROGMEM - this stores variables? in flash - this seems too complicated
+  -the printInterupt serial output in the softPWM library is way too verbose and uses a lot of memory, cut it down
 */
