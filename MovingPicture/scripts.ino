@@ -23,7 +23,10 @@ void script(byte scriptID){
       allShift();
     break;
     case 5:
-      strobe();
+      strobeMain();
+
+ //     allShiftRandom();
+
     break;
 
   }

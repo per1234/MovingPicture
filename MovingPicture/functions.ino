@@ -9,7 +9,7 @@ void setup(){
   //Serial.begin(9600);  //for debugging
   SoftPWM.begin(120);  //start the SoftPWM and set the PWM frequency
   for(byte softPWMchannel=0;softPWMchannel<=SoftPWM.size();softPWMchannel++){  //cycle through all the softPWM channels
-      SoftPWM.set(softPWMchannel, 1);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
+      SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
   }
   //I'm setting these variables up here because the randomSeed(analogRead(0)) doesn't work at the top of the sketch where I'm declaring variables for some reason and I need to do the randomSeed(analogRead(0)) before picking random variables
   fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);  //the maximum bound of the rendomly chosen length of time that the fade will occur over
@@ -22,16 +22,48 @@ void newColor(byte positionID){  //set the new color program for the given posit
   fadeDelay = random(fadeDelayMin,fadeDelayMax);  //pick the end time for the fade to the new color
   byte newColorArray[3];
   for(byte e=0;e<=2;e++){
-    newColorArray[e]=random(1,SoftPWM.brightnessLevels());  //pick random brightness values for R, G, and B
+    newColorArray[e]=random(offLevel,SoftPWM.brightnessLevels());  //pick random brightness values for R, G, and B
   }
   while(newColorArray[0]+newColorArray[1]+newColorArray[2]<valueTotalMin){  //make sure the brightness is greater than the minimum value
     for(byte e=0;e<=2;e++){
-      newColorArray[e]=random(1,SoftPWM.brightnessLevels());  //pick new values
+      newColorArray[e]=random(offLevel,SoftPWM.brightnessLevels());  //pick new values
     }
   }
   for(byte e=0;e<=2;e++){
     program[e+(positionID-1)*3][0]=newColorArray[e];  //update the end brightness
     program[e+(positionID-1)*3][1]=millis()+fadeDelay;  //update the end time
+  }
+}
+
+void setter(){  //sets the RGBLEDs to their current values
+  for(byte i=0;i<=2;i++){
+    for(byte j=0;j<=pos1size;j++){
+      SoftPWM.set(pos1[j]*3+i, program[i][2]);
+    }
+  }
+  for(byte i=3;i<=5;i++){
+    for(byte j=0;j<=pos2size;j++){
+      SoftPWM.set(pos2[j]*3+i-3, program[i][2]);
+    }
+  }
+  for(byte i=0;i<SoftPWM.size()/3;i++){  //step through all RGBLEDs to see if any are not in a position
+    setterFlag=0;
+    for(byte j=0;j<=pos1size;j++){
+      if(i==pos1[j]){  
+        setterFlag=1;  //already in a position
+      }
+    }
+    for(byte j=0;j<=pos2size;j++){
+      if(i==pos2[j]){
+        setterFlag=1;  //already in a position
+      }
+    }
+    if(setterFlag==0){
+      for(byte j=0;j<=2;j++){
+        SoftPWM.set(i*3+j, offLevel);  //not in a position so turn it off
+//      digitalWrite(13, HIGH);
+      }
+    }
   }
 }
 
@@ -50,15 +82,15 @@ void pos1equalsPos2(){  //copy old position 2 to position 1
   }  //END position1=position2
 }
 
-void newPos(){  //chooses the size of the new position and which pins are in it this just does postition 2 right now but it could have a position parameter easily
-  pos2size=random(0,SoftPWM.size()/3-pos1size); //new position 2 - this will have problems if position 1 or 2 have all the RGBLEDs
+void newPos(){  //New Position 2 - chooses the size of the new position and which pins are in it this just does postition 2 right now but it could have a position parameter easily
+  pos2size=random(0,SoftPWM.size()/3-1-pos1size); //(zero indexed, hence the -1)new position 2 - this will have problems if position 1 or 2 have all the RGBLEDs call fillAllPos(); newPos();pos1equalsPos2();newPos(); to recover from all pins being put in one position
   for(byte i=0;i<=pos2size;i++){
     pos2[i]=random(0,SoftPWM.size()/3);  
     for(byte j=0;j<=pos1size;j++){  //make sure the led isn't already in position 1
       while(pos2[i]==pos1[j]){
         pos2[i]=random(0,SoftPWM.size()/3);
         j=0;  //restart the for loop and recheck to see if the new led number is already in position 1
-        for(byte k=0;k<=i-1;k++){  //make sure the led isn't already in pos2
+        for(byte k=0;k<=i-1;k++){  //make sure the led isn't already in pos2, won't run if this is the first RGBLED in the position
           while(pos2[k]==pos2[i]){
             pos2[i]=random(0,SoftPWM.size()/3);
             j=0;  //restart the for loop and recheck to see if the new led number is already in position 1
@@ -71,11 +103,11 @@ void newPos(){  //chooses the size of the new position and which pins are in it 
 }
 
 void fillAllPos(){
-  pos1size=1;  //put all the pins in position1 or position2
+  pos1size=0;  //put all the pins in position1 or position2
   pos1[0]=0;
-  pos2size=SoftPWM.size()/3-2;  //position 2 is large enough to fit all the rest of the RGBLEDs
-  for(byte w=1;w<SoftPWM.size()/3;w++){  //step through the leds
-    pos2[w]=w;  //put all the leds in position 2
+  pos2size=SoftPWM.size()/3;  //position 2 is large enough to fit all the rest of the RGBLEDs
+  for(byte w=1;w<=pos2size;w++){  //step through the leds
+    pos2[w-1]=w;  //put all the leds in position 2
   }
 }
 
@@ -120,7 +152,7 @@ fader();  //the fader function changes brightness values to reach the target bri
 //fader();  //I think more calls to the fader might make for smoother fades, the script() function doesn't need to update anywhere near as frequently
 //interruptLoadCheck()  //for debugging
 //sramCheck();  //for debugging
-debugBlink();  //for debugging
+//debugBlink();  //for debugging
 //millisBlink();  //for debugging
 }
 
@@ -146,7 +178,7 @@ void sramCheck(){  //turns on led if there is less than the set value of free sr
 }
 */
 
-
+/*
 void debugBlink(){  //blinks pin 13
   if(millis()>=debugBlinkNextTime){
     if (debugBlinkState==0){
@@ -161,7 +193,7 @@ void debugBlink(){  //blinks pin 13
     }
   }
 }
-
+*/
 
 /*
 void millisBlink(){
