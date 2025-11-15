@@ -16,6 +16,8 @@ void setup(){
   fadeDelayMin=random(fadeDelayMinSet, fadeDelayMax - fadeDelayDiffMin);  //the minimum bound of the rendomly chosen length of time that the fade will occur over
   valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet)*(SoftPWM.brightnessLevels()-1)*3/100;  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on - converts from a percent to a this should be set up to work with different numbers of brightness levels
   newPos();
+  pos1equalsPos2();
+  newPos();
 }
 
 void newColor(byte positionID){  //set the new color program for the given position
@@ -32,6 +34,7 @@ void newColor(byte positionID){  //set the new color program for the given posit
   for(byte e=0;e<=2;e++){
     program[e+(positionID-1)*3][0]=newColorArray[e];  //update the end brightness
     program[e+(positionID-1)*3][1]=millis()+fadeDelay;  //update the end time
+    program[e+(positionID-1)*3][3]=millis();  //update the last brightness change time    
   }
 }
 
@@ -73,13 +76,10 @@ void pos1equalsPos2(){  //copy old position 2 to position 1
   }
   pos1size=pos2size;
   for(byte k=0;k<=2;k++){
-    program[k][2]=program[k+3][2];  //copy current brightness and last brightness change time from position 1 to position 2
-    program[k][3]=program[k+3][3];        
+    for(byte l=0;l<=3;l++){
+      program[k][l]=program[k+3][l];  //copy the program over from position 1 to position 2, I used to have only the current brightness and last brightness change time and that might be all I need
+    }
   }
-  for(byte i=3;i<=5;i++){
-    program[i][2]=1;  //update the position 2 current brightness(1)
-    program[i][3]=millis();  //update the position 2 last change time
-  }  //END position1=position2
 }
 
 void newPos(){  //New Position 2 - chooses the size of the new position and which pins are in it this just does postition 2 right now but it could have a position parameter easily
@@ -102,15 +102,21 @@ void newPos(){  //New Position 2 - chooses the size of the new position and whic
   }
 }
 
-void fillAllPos(){
-  pos1size=0;  //put all the pins in position1 or position2
-  pos1[0]=0;
-  pos2size=SoftPWM.size()/3;  //position 2 is large enough to fit all the rest of the RGBLEDs
-  for(byte w=1;w<=pos2size;w++){  //step through the leds
-    pos2[w-1]=w;  //put all the leds in position 2
+void fillAllPos2(){
+  pos2size=0;
+  for(byte i=0;i<=SoftPWM.size()/3-1;i++){
+    setterFlag=0;
+    for(byte j=0;j<=pos1size;j++){
+      if(pos1[j]==i){
+        setterFlag=1;
+      }
+    }
+    if(setterFlag==0){
+      pos2size=fillAllPosCount++;  //this has to be set up weird like this because of the zero indexed pos2size
+      pos2[pos2size]=i;
+    }
   }
 }
-
 
 void fader(){  //the current code only allows the fader to increment by 1 even if the program calls for faster, this seems like it enforces smooth fades over reaching the goal but will not work well for instant brightness changes, I have had trouble doing instant changes directly for some reason
   for(byte i=0;i<=5;i++){  //cycle through the program rows

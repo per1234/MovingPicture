@@ -26,7 +26,8 @@ streamline the fader code!
 -optimization - there is flash(code) and sram(variables?) and the sketch must fit in the limits of both
   -create a stripped down version of the softPWM library and see if it will change memory usage
   -use const for all constant variables
-  -int>byte
+  -long>int>byte
+  -unsigned time variables if possible to allow more time before the rollover
   -functions
   -check for unused variables
   -i could split the program array into 2 different arrays, one is target and current brightness(byte), the other is end and last brightness change time(long)
@@ -36,6 +37,8 @@ streamline the fader code!
   -the printInterupt serial output in the softPWM library is way too verbose and uses a lot of memory, cut it down and I think it used a floating number for the interupt readout, it seems like it could be a percentage instead
   -work on the fader code it can be cut down a lot
   -call fader() more frequently as it needs to work faster than script()
+  -scriptlet setup step instead of setting variables over and over
+  -try the delay version of the library again to confirm that it is a visible delay between channels
 -maybe
   -use internal thermometer(secret thermometer library?) to have a safety cutoff if it gets too hot
   -rotary selector input

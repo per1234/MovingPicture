@@ -24,10 +24,14 @@ void script(byte scriptID){
     break;
     case 5:
       strobeMain();
-
- //     allShiftRandom();
-
     break;
-
+    case 6:
+//      fadeUpBack();
+      standard();
+      allShiftRandom();
+//      strobeMain();
+//      strobe();
+//      allShift();
+    break;
   }
 }

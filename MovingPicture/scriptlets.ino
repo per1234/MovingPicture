@@ -36,7 +36,7 @@ void strobeMain(){  //sets the brightness levels to 0 for the maximum strobe onl
 
 //add-on scriptlets:
 
-void strobe(){  //randomly turns all leds on full and then back to the previous value and program add random color option
+void strobe(){  //randomly turns all leds on full and then back to the previous value and program add random color option - this doesn't look good on scripts with lots of all-led on time because the strobe only has a dramatic effect when there is a significant contrast, otherwise it just looks like a hiccup in the program
   if(programControl==0 || strobeStep>0){  //check if the main program has control, don't want to activate if another add-on has control
     if(strobeStep==0){
       strobeOn();
@@ -54,7 +54,7 @@ void fadeUpBack(){  //randomly fades all leds to full brightness and then choose
       if(fadeUpBackStep==0){  //crossfade position 1 to position2
         fadeUp();
       }
-      else{
+      if(fadeUpBackStep==1){
         fadeBack();
       }
     }
@@ -68,38 +68,35 @@ void allShiftRandom(){  //fades all leds up to a random color and then shifts th
       if(allShiftRandomStep<=allShiftRandomIterations){
         allShiftOnce();
       }
-      else{  //finish the allShiftRandom
-        fillAllPos();
-        newPos();
-        pos1equalsPos2();
-        newPos();
-        newColor(2);  //color shift on position2
-        fadeOut();  //fadeOut position1
-        standardStep=0;  //next step is the crossfade
-        programControl=0;  //give control back to the main scriptlet
+      if(allShiftRandomStep>allShiftRandomIterations){  //finish the allShiftRandom
         allShiftRandomNextTime=millis()+random(allShiftRandomDelayMin,allShiftRandomDelayMax)+fadeDelay;
         allShiftRandomStep=0;  //reset for next time
+        fadeBack();
       }
     }
   }
 }
 
 //scriptlet components:
-
 void allShiftOnce(){
-  if(millis()>= program[3][1]){  //check if the position 2 color shift is complete
-//  if(allShiftRandomStep  fillAllPos();
-    if(allShiftRandomStep==0){  //setup
-      allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift
-      pos2size=4;  //position one is set to contain all the RGBs this is not optimum to set the variable over and over again
-      for(byte u=0;u<SoftPWM.size()/3;u++){  //step through the RGB leds;
-        pos2[u]=u;  //put ell RGB leds in position 1
+  if(standardStep==1){ //it is ready for a crossfade
+    if(millis()>= program[0][1]){  //check if the fade is complete
+      if(allShiftRandomStep==0){  //setup
+        allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift
+        pos1equalsPos2();
+        fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1
       }
+      newColor(2);  //set new color for position 2
+//            newColor(1);  //set new color for position 2
+      for(byte i=0;i<=2;i++){  //copy over the new program from position 2 to position 1
+        for(byte j=0;j<=1;j++){
+          program[i][j]=program[i+3][j];
+        }
+      }  
+      allShiftRandomStep=allShiftRandomStep+1;
     }
-    newColor(2);  //set new color for position 1
-    allShiftRandomStep=allShiftRandomStep+1;
-  }
-}  
+  }  
+}
 
 void colorShift(){
   if(millis()>= program[0][1]){  //check if the previous program is complete
@@ -114,6 +111,9 @@ void crossFade(){
     pos1equalsPos2();
     newPos();  //new position 2
     newColor(2);  //new color on position 2
+    for(byte i=3;i<=5;i++){
+      program[i][2]=offLevel;  //set the current brightness level for position 2 to off
+    }
     fadeOut();  //fade postition 1 to brightness 1
     standardStep=0;  //switch back to the shift
 //      digitalWrite(13, LOW);  //for debugging
@@ -121,28 +121,32 @@ void crossFade(){
 }
 
 void fadeUp(){  //set the target brightness to 255 for all leds and the fade end time to a random length of time
-  if(millis()>= program[3][1]){  //check if the fade for position 2 is complete
-    fillAllPos();  //make sure all RGBLEDs are in position 1 or position 2
-    fadeDelay=random(fadeDelayMin,fadeDelayMax);  //pick a length of time for the fadeUp
-    for(byte b=0;b<=5;b++){  //step through the program rows
-      program[b][0] = 255;  //set target brightness
-      program[b][1] = millis()+fadeDelay;  //set fade end time
-    }
-    fadeUpBackStep=1;
-  } 
+  if(standardStep==1){
+    if(millis()>= program[0][1]){  //check if the fade is complete
+      pos1equalsPos2();
+      fillAllPos2();  //make sure all RGBLEDs are in position 1 or position 2
+      fadeDelay=random(fadeDelayMin,fadeDelayMax);  //pick a length of time for the fadeUp
+      for(byte b=0;b<=5;b++){  //step through the program rows
+        program[b][0] = SoftPWM.brightnessLevels()-1;  //set target brightness
+        program[b][1] = millis()+fadeDelay;  //set fade end time
+      }
+      fadeUpBackStep=1;
+    } 
+  }
 }
 
 void fadeBack(){  //this picks new positions and a new color and fades one position to the new color and the other to 0
   if(millis()>= program[0][1]){  //check if the fade is complete
     newPos();  //new position 2
-    pos1equalsPos2(); //fills position 2
-    newPos();  //new position 2
+    pos1equalsPos2(); //fills position 1
+    fillAllPos2();  //new position 2 - this needs to take all the free pins
     newColor(2);  //new color for position 2
+    
     fadeOut();  //fade out position 1
     fadeUpBackNextTime=millis()+random(fadeUpBackDelayMin,fadeUpBackDelayMax);  //when the next fadeUpBack will occur
     fadeUpBackStep=0;  //reset for next time
     programControl=0;  //give the program control back to the main script
-    standardStep=0;  //next step is the crossfade
+    standardStep=1;  //next step is the crossfade
   } 
 }
 
@@ -154,7 +158,7 @@ void strobeOn(){  //this needs to save the program array in a different array an
       program[i][0]=program[i][2];  //set the target brightness to the current brightness so the fader will not change brightness while the strobe is on
     }
     for(byte i=0;i<SoftPWM.size();i++){  //turn them all on
-      SoftPWM.set(i,255);
+      SoftPWM.set(i,SoftPWM.brightnessLevels()-1);
     }
     programControl=1;  //this takes control of the program from the main script
     strobeStep=1;  //next step is strobeOff
@@ -191,6 +195,7 @@ void fadeOut(){ //sets position 1 brightness to 1, make sure to do a newColor() 
   for(byte t=0;t<=2;t++){
     program[t][0]=offLevel;  //update the position 1 end brightness(0)
     program[t][1]=millis()+fadeDelay;  //update the position 1 end time
+    program[t][3]=millis();  //update the lact brightness change time
   }
 }
   
