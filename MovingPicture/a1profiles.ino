@@ -1,5 +1,4 @@
 //this tab must be named so that it will sort first after the top tab and be concatenated in the proper order
-//I could get rid of this and just pass the parameters to the scripts in the script function and do the comment out thing there
 //uncomment the settings you want and leave the rest commented out
 
 //test profile
@@ -19,7 +18,7 @@ const int fadeUpBackDelayMax=10000;  //this should be setup randomized eventuall
 const int allShiftRandomDelayMin=8000;  //this should be setup randomized eventually
 const int allShiftRandomDelayMax=18000;  //this should be setup randomized eventually
 const byte allShiftRandomMax=4;  //the maximum number of allShifts it will consecutively do before returning to the previous program - not implemented yet right now the minimum is 1
-const byte scriptID=0;
+const byte scriptID=5;  //the ID number of the script in the scripts tab that is used in this profile
 
 /*
 //standard shift/crossfade

@@ -22,5 +22,9 @@ void script(byte scriptID){
     case 4:
       allShift();
     break;
+    case 5:
+      strobe();
+    break;
+
   }
 }

@@ -51,7 +51,7 @@ void pos1equalsPos2(){  //copy old position 2 to position 1
 }
 
 void newPos(){  //chooses the size of the new position and which pins are in it this just does postition 2 right now but it could have a position parameter easily
-  pos2size=random(0,SoftPWM.size()/3-pos1size); //new position 2
+  pos2size=random(0,SoftPWM.size()/3-pos1size); //new position 2 - this will have problems if position 1 or 2 have all the RGBLEDs
   for(byte i=0;i<=pos2size;i++){
     pos2[i]=random(0,SoftPWM.size()/3);  
     for(byte j=0;j<=pos1size;j++){  //make sure the led isn't already in position 1
@@ -69,6 +69,16 @@ void newPos(){  //chooses the size of the new position and which pins are in it 
     }
   }
 }
+
+void fillAllPos(){
+  pos1size=1;  //put all the pins in position1 or position2
+  pos1[0]=0;
+  pos2size=SoftPWM.size()/3-2;  //position 2 is large enough to fit all the rest of the RGBLEDs
+  for(byte w=1;w<SoftPWM.size()/3;w++){  //step through the leds
+    pos2[w]=w;  //put all the leds in position 2
+  }
+}
+
 
 void fader(){  //the current code only allows the fader to increment by 1 even if the program calls for faster, this seems like it enforces smooth fades over reaching the goal but will not work well for instant brightness changes, I have had trouble doing instant changes directly for some reason
   for(byte i=0;i<=5;i++){  //cycle through the program rows
@@ -110,7 +120,7 @@ fader();  //the fader function changes brightness values to reach the target bri
 //fader();  //I think more calls to the fader might make for smoother fades, the script() function doesn't need to update anywhere near as frequently
 //interruptLoadCheck()  //for debugging
 //sramCheck();  //for debugging
-//debugBlink();  //for debugging
+debugBlink();  //for debugging
 //millisBlink();  //for debugging
 }
 
@@ -136,7 +146,7 @@ void sramCheck(){  //turns on led if there is less than the set value of free sr
 }
 */
 
-/*
+
 void debugBlink(){  //blinks pin 13
   if(millis()>=debugBlinkNextTime){
     if (debugBlinkState==0){
@@ -151,7 +161,7 @@ void debugBlink(){  //blinks pin 13
     }
   }
 }
-*/
+
 
 /*
 void millisBlink(){
