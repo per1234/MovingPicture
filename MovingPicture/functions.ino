@@ -1,9 +1,3 @@
-/*
-organize according to main script type functions(standard/allShift) that can only be used one at a time, addon functions(strobe, allShiftRandom, fadeUpBack) that can be used in combination, and other(general functions, debug, etc). split into separate tabe
-todo:
-  -ministrobe
-  -rainbow chase
-*/
 void setup(){
   randomSeed(analogRead(0));  //makes the pseudorandom number sequence start at a different position each boot - this needs a more random input
   //Serial.begin(9600);  //for debugging
@@ -15,9 +9,9 @@ void setup(){
   fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);  //the maximum bound of the rendomly chosen length of time that the fade will occur over
   fadeDelayMin=random(fadeDelayMinSet, fadeDelayMax - fadeDelayDiffMin);  //the minimum bound of the rendomly chosen length of time that the fade will occur over
   valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet)*(SoftPWM.brightnessLevels()-1)*3/100;  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on - converts from a percent to brightness levels
-  newPos();  //it needs a position2 for the standard scriptlat to work
-  pos1equalsPos2();  //probably not necessary but it seems a good idea to start with 2 positions full
-  newPos();
+  newPos2();  //it needs a position2 for the standard scriptlat to work
+  pos1equalsPos2();  //probably not necessary but it seems a good idea to start with both positions full
+  newPos2();
 }
 
 void newColor(byte positionID){  //set the new color program for the given position
@@ -38,7 +32,7 @@ void newColor(byte positionID){  //set the new color program for the given posit
   }
 }
 
-void setter(){  //sets the RGBLEDs to their current values
+void setter(){  //sets the RGBLEDs to their current program values - currently used for recovery from the strobe() add-on
   for(byte i=0;i<=2;i++){
     for(byte j=0;j<=pos1size;j++){
       SoftPWM.set(pos1[j]*3+i, program[i][2]);
@@ -50,7 +44,7 @@ void setter(){  //sets the RGBLEDs to their current values
     }
   }
   for(byte i=0;i<SoftPWM.size()/3;i++){  //step through all RGBLEDs to see if any are not in a position
-    setterFlag=0;
+    byte setterFlag;
     for(byte j=0;j<=pos1size;j++){
       if(i==pos1[j]){  
         setterFlag=1;  //already in a position
@@ -82,8 +76,8 @@ void pos1equalsPos2(){  //copy old position 2 to position 1
   }
 }
 
-void newPos(){  //New Position 2 - chooses the size of the new position and which pins are in it this just does postition 2 right now but it could have a position parameter easily
-  pos2size=random(0,SoftPWM.size()/3-1-pos1size); //(zero indexed, hence the -1)new position 2 - this will have problems if position 1 or 2 have all the RGBLEDs call fillAllPos(); newPos();pos1equalsPos2();newPos(); to recover from all pins being put in one position
+void newPos2(){  //New Position 2 - chooses the size of the new position and which pins are in it this just does postition 2 right now but it could have a position parameter easily
+  pos2size=random(0,SoftPWM.size()/3-1-pos1size); //(zero indexed, hence the -1)new position 2 - this will have problems if position 1 or 2 have all the RGBLEDs call fillAllPos(); newPos2();pos1equalsPos2();newPos2(); to recover from all pins being put in one position
   for(byte i=0;i<=pos2size;i++){
     pos2[i]=random(0,SoftPWM.size()/3);  
     for(byte j=0;j<=pos1size;j++){  //make sure the led isn't already in position 1
@@ -103,15 +97,17 @@ void newPos(){  //New Position 2 - chooses the size of the new position and whic
 }
 
 void fillAllPos2(){
+  byte fillAllPos2flag;
+  byte fillAllPosCount;
   pos2size=0;
   for(byte i=0;i<=SoftPWM.size()/3-1;i++){
-    setterFlag=0;
+    fillAllPos2flag=0;
     for(byte j=0;j<=pos1size;j++){
-      if(pos1[j]==i){
-        setterFlag=1;
+      if(pos1[j]==i){  //the RGBLED is in position 1
+        fillAllPos2flag=1;
       }
     }
-    if(setterFlag==0){
+    if(fillAllPos2flag==0){  //the RGBLED wasn't in position 1
       pos2size=fillAllPosCount++;  //this has to be set up weird like this because of the zero indexed pos2size
       pos2[pos2size]=i;
     }

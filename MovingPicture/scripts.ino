@@ -83,7 +83,6 @@ void allShiftOnce(){
     if(millis()>= program[0][1]){  //check if the fade is complete
       if(allShiftRandomStep==0){  //setup
         allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift
-        pos1equalsPos2();
         fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1
       }
       newColor(2);  //set new color for position 2
@@ -99,7 +98,7 @@ void allShiftOnce(){
 
 void colorShift(){
   if(millis()>= program[0][1]){  //check if the previous program is complete
-    newColor(2);  //set new color for position 1
+    newColor(2);  //set new color for position 2
     standardStep=1;  //switch to the crossfade
     //digitalWrite(13, HIGH);  //for debugging
   }
@@ -108,7 +107,7 @@ void colorShift(){
 void crossFade(){
   if(millis()>=program[0][1]){  //check if the previous program is complete
     pos1equalsPos2();
-    newPos();  //new position 2
+    newPos2();  //new position 2
     newColor(2);  //new color on position 2
     for(byte i=3;i<=5;i++){
       program[i][2]=offLevel;  //set the current brightness level for position 2 to off
@@ -136,7 +135,7 @@ void fadeUp(){  //set the target brightness to 255 for all leds and the fade end
 
 void fadeBack(){  //this picks new positions and a new color and fades one position to the new color and the other to 0
   if(millis()>= program[0][1]){  //check if the fade is complete
-    newPos();  //new position 2
+    newPos2();  //new position 2
     pos1equalsPos2(); //fills position 1
     fillAllPos2();  //new position 2 - this needs to take all the free pins
     newColor(2);  //new color for position 2
@@ -179,7 +178,7 @@ void strobeOff(){
   if(millis()>=strobeNextTime){
     for(byte i=0;i<=5;i++){    //step through the RGB for position 1 and 2
       program[i][0]=lastTargetBrightness[i];  //reset the program to the pre-strobe values - this would be better if it added the strobetime to the end time but that will require another long
-  //        Serial.println(program[row][0]);
+    //Serial.println(program[row][0]);
     }
     setter();
     strobeStep=0;  //reset for next time

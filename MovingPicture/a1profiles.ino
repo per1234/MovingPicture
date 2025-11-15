@@ -31,8 +31,8 @@ void script(){
   //fadeUpBack();
   //allShiftRandom();
   //strobeMain();
-  //strobe();
-  allShift();
+  strobe();
+  //allShift();
 }
 
 /*

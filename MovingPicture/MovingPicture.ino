@@ -81,8 +81,6 @@ byte strobeStep;  //is the strobe on or off flag
 unsigned long strobeNextTime;  //the time until the next strobe;
 byte fadeUpBackStep;  //the step the fadeUpBack() function is currently in
 unsigned long fadeUpBackNextTime;  //the next time to do a fadeUpBack
-unsigned long allShiftRandomStep;  //the current step of the allShiftRandom add-on script - I think the rollover is causing allShift to lock up so I'm trying unsigned long to narrow it down
+byte allShiftRandomStep;  //the current step of the allShiftRandom add-on script
 unsigned long allShiftRandomNextTime;  //the next time the allShiftRandom add-on script will run
 byte allShiftRandomIterations;  //the number of times the current allShiftRandom will color shift
-byte setterFlag;  //try to get rid of this
-byte fillAllPosCount;  //try to get rid of this
