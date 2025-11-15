@@ -8,7 +8,8 @@ void setup(){
   randomSeed(analogRead(0));  //makes the pseudorandom number sequence start at a different position each boot - this needs a more random input
   //Serial.begin(9600);  //for debugging
   SoftPWM.begin(120);  //start the SoftPWM and set the PWM frequency
-  for(byte softPWMchannel=0;softPWMchannel<=SoftPWM.size();softPWMchannel++){  //cycle through all the softPWM channels      SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
+  for(byte softPWMchannel=0;softPWMchannel<=SoftPWM.size();softPWMchannel++){  //cycle through all the softPWM channels
+      SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
   }
   //I'm setting these variables up here because the randomSeed(analogRead(0)) doesn't work at the top of the sketch where I'm declaring variables for some reason and I need to do the randomSeed(analogRead(0)) before picking random variables
   fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);  //the maximum bound of the rendomly chosen length of time that the fade will occur over
@@ -140,7 +141,6 @@ void fader(){  //the current code only allows the fader to increment by 1 even i
     }
   }
 }
-
 
 void loop(){
 script(scriptID);  //the script function runs the collection of functions in the scriptID that is set in the current profile

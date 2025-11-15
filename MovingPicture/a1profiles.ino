@@ -2,7 +2,7 @@
 //uncomment the settings you want and leave the rest commented out
 
 //test profile
-const int fadeDelayMinSet = 8000;  //shortest shift time
+const int fadeDelayMinSet = 3000;  //shortest shift time
 const int fadeDelayMaxSet = 16000;  //the longest time that it will color shift.
 const int fadeDelayDiffMin = 700;  //the minimum difference in the range of fade speeds
 const int valueTotalMinMinSet = 35; //minimum sum of percentages of the RGB diodes of an LED. This avoids it picking too dim colors.
@@ -11,10 +11,10 @@ const int valueTotalMinMaxSet = 70; //minimum sum of percentages of the RGB diod
 //const int valueDiffMinMaxSet=45;  //the maximum bound of the randomly selected minimum change in value of each color. not yet implemented
 //const int valueDiffMaxMinSet=15;  //the minimum bound of the randomly selected maximum change in value of each color. not yet implemented
 //const int valueDiffMaxMaxSet=45;  //the maximum bound of the randomly selected maximum change in value of each color. not yet implemented
-const byte strobeTimeMin=3;  //the minimum length of time the strobe is on - I don't think it needs powerup randomization
-const byte strobeTimeMax=30;  //the maximum length of time the strobe is on - I don't think it needs powerup randomization
-const int strobeDelayMin=800;  //the minimum time between strobes
-const int strobeDelayMax=4000;  //the maximum time between strobes
+const long strobeTimeMin=3;  //the minimum length of time the strobe is on - I don't think it needs powerup randomization
+const long strobeTimeMax=30;  //the maximum length of time the strobe is on - I don't think it needs powerup randomization
+const long strobeDelayMin=800;  //the minimum time between strobes
+const long strobeDelayMax=4000;  //the maximum time between strobes
 //const byte strobeIterationsMin;  //the minimum number of strobe pulses each time it fires - not yet implemented
 //const byte strobeIterationsMax;  //the maximum number of strobe pulses each time it fires - not yet implemented
 //const byte strobeIterationDelayMin;  //the minimum length of time between strobe pulses - not yet implemented
