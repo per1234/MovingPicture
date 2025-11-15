@@ -29,7 +29,7 @@ byte pos2[ledNum];  //The postition 1 array - this contains the numbers of the L
 byte pos2size;  //the current number of items in the pos2 array(zero indexed) - get rid of the zero index thing too confusing
 int fadeDelay;  //the length of time that the fade will occur over, should be moved to the various functions that need it(crossfade, shift, etc.)
 long program[6][4];  //[pos1R, pos1G, pos1B, pos2R, pos2G, pos2B][target brightness, end time, current brightness, last brightness change time]
-long lastProgram[6][4];  //used to store the previous program in the strobe function
+long lastTargetBrightness[6];  //used to store the previous target brightness values from the program[] array in the strobe function
 byte programStep=1;  //used to step through various different script actions
 byte oldProgramStep;  //used to store the previous programStep value
 int fadeDelayMax;  //this is randomly set in the initialize function

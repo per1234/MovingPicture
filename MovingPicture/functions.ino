@@ -71,8 +71,22 @@ void strobe(){  //randomly turns all leds on full and then back to the previous 
 void allShiftRandom(){  //fades all leds up to a random color and then shifts the color of all leds a random number of times, then picks new positions and new colors for position 1 and fades to the color on position 1 and to 0 on position 2 and then goes to crossfade
 }
 
-void newPos(){  //chooses the size of the new position and which pins are in it
-//copy old position 2 to position 1 and get the new postition 2
+void pos1equalsPos2(){  //copy old position 2 to position 1
+  for(byte k=0;k<=pos2size;k++){  //START position1 = position2
+    pos1[k]=pos2[k];  
+  }
+  pos1size=pos2size;
+  for(byte k=0;k<=2;k++){
+    program[k][2]=program[k+3][2];  //copy current brightness and last brightness change time from position 1 to position 2
+    program[k][3]=program[k+3][3];        
+  }
+  for(byte i=3;i<=5;i++){
+    program[i][2]=1;  //update the position 2 current brightness(1)
+    program[i][3]=millis();  //update the position 2 last change time
+  }  //END position1=position2
+}
+
+void newPos(){  //chooses the size of the new position and which pins are in it this just does postition 2 right now but it could have a position parameter easily
   pos2size=random(0,SoftPWM.size()/3-pos1size); //new position 2
   for(byte i=0;i<=pos2size;i++){
     pos2[i]=random(0,SoftPWM.size()/3);  
@@ -90,21 +104,6 @@ void newPos(){  //chooses the size of the new position and which pins are in it
       }
     }
   }
-  for(byte i=3;i<=5;i++){
-    program[i][2]=1;  //update the position 2 current brightness(1)
-    program[i][3]=millis();  //update the position 2 last change time
-    
-
-    for(byte k=0;k<=pos2size;k++){  //START position1 = position2
-      pos1[k]=pos2[k];  
-    }
-    pos1size=pos2size;
-    for(byte k=0;k<=2;k++){
-      program[k][2]=program[k+3][2];  //copy current brightness and last brightness change time from position 1 to position 2
-      program[k][3]=program[k+3][3];        
-    }  //END position1=position2
-    
-  }
 }
 
 void colorShift(){
@@ -117,6 +116,7 @@ void colorShift(){
 
 void crossFade(){
   if(millis()>=program[0][1]){  //check if the previous program is complete
+    pos1equalsPos2();
     newPos();  //new position 2
     newColor(2);  //new color on position 2
     for(byte t=0;t<=2;t++){
@@ -144,63 +144,57 @@ void fadeUp(){  //set the target brightness to 255 for all leds and the fade end
 }
 void fadeBack(){  //this picks new positions and a new color and fades one position to the new color and the other to 0
   if(millis()>= program[3][1]){  //check if the fade for position 2 is complete
-//    newPos(2);
+//    newPos(2);  //the newPos() function doesn't currently have a positionID parameter, maybe I could just put all RGBLEDs in one position
 //    newPos(1);
     newColor(1);  //new color for position 1
     for(byte b=3;b<=5;b++){  //step through the position 2 rows
       program[b][0] = 1;  //set target brightness 
-      program[b][1] = millis()+fadeDelay;  //set fade end time
+      program[b][1] = millis()+fadeDelay;  //set fade end time the fadeDelay variable has just been randomly set by the newColor() function so this will match the position 2 color shift
     }
   fadeUpBackNextTime=millis()+random(fadeUpBackDelayMin,fadeUpBackDelayMax);
   programStep=2;  //the next step will be the crossfade - it might be best to make it go back to the previous(the value before this function was called) programStep to make it compatible with more combos
   } 
 }
-void fader(){
+void fader(){  //the current code only allows the fader to increment by 1 even if the program calls for faster, this seems like it enforces smooth fades over reaching the goal but will not work well for instant brightness changes, I have had trouble doing instant changes directly for some reason
   for(byte i=0;i<=5;i++){  //cycle through the program rows
-    if(program[i][0] != program[i][2]){  //no change needed if the start and end brightness are equal
-      if(millis()-program[i][3]>=(program[i][1]-program[i][3])/(abs(program[i][0]-program[i][2])+1)){  //check if it's time to change the brightness
-        if(program[i][0]-program[i][2]>0){  //check if it is a positive change
-          program[i][2]=program[i][2]+1;  //update the current brightness
-          if(i<3){  //change brightness of position 1
-            for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
-              SoftPWM.set(pos1[j]*3+i, program[i][2]);  //change the brightness 
-            }
-          }
-          if(i>=3){  //change brightness of position 2
-            for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
-              SoftPWM.set(pos2[j]*3+i-3, program[i][2]);  //change the brightness
-            }
+    if(program[i][0] != program[i][2] && millis()-program[i][3]>=(program[i][1]-program[i][3])/(abs(program[i][0]-program[i][2])+1)){  //no change needed if the start and end brightness are equal
+      if(program[i][0]-program[i][2]>0){  //check if it is a positive change
+        program[i][2]=program[i][2]+1;  //update the current brightness
+        if(i<3){  //change brightness of position 1
+          for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
+            SoftPWM.set(pos1[j]*3+i, program[i][2]);  //change the brightness 
           }
         }
-        if(program[i][0]-program[i][2]<0){  //check if it is a negative change
-          program[i][2]=program[i][2]-1; //update the current brightness
-          if(i<3){  //change brightness of position 1
-            for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
-              SoftPWM.set(pos1[j]*3+i, program[i][2]);  //change the brightness
-            }
-          }
-          if(i>=3){  //change brightness of position 2
-            for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
-              SoftPWM.set(pos2[j]*3+i-3, program[i][2]);  //change the brightness       
-            }
+        if(i>=3){  //change brightness of position 2
+          for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
+            SoftPWM.set(pos2[j]*3+i-3, program[i][2]);  //change the brightness
           }
         }
-        program[i][3]=millis();  //update the last brightness change time
       }
+      if(program[i][0]-program[i][2]<0){  //check if it is a negative change
+        program[i][2]=program[i][2]-1; //update the current brightness
+        if(i<3){  //change brightness of position 1
+          for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
+            SoftPWM.set(pos1[j]*3+i, program[i][2]);  //change the brightness
+          }
+        }
+        if(i>=3){  //change brightness of position 2
+          for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
+            SoftPWM.set(pos2[j]*3+i-3, program[i][2]);  //change the brightness       
+          }
+        }
+      }
+      program[i][3]=millis();  //update the last brightness change time
     }
   }
 }
 void strobeOn(){  //this needs to save the program array in a different array and then set the program to full on and then after the strobeTime set it back to the original program array with strobeTime added to all end and last times in the array
     if(millis()>=strobeNextTime){  //turn on the strobe
       for(byte row=0;row<=5;row++){    //step through the RGB for position 1 and 2
-        for(byte col=0;col<=3;col++){  //and the progam columns
-          lastProgram[row][col]=program[row][col];  //save the current program
-        }
-        program[row][0]=255;  //target brightness
-        program[row][2]=254;  //current brightness
-        program[row][1]=millis()+10;  //fade end time
+        lastTargetBrightness[row]=program[row][0];  //save the current program - I only need to save target brightness for the 6 rows
+        program[row][0]=program[row][2];  //set the target brightness to the current brightness so the fader will not change brightness while the strobe is on
       }
-      digitalWrite(13, HIGH);   //
+      //digitalWrite(13, HIGH);   //for debugging
       oldProgramStep=programStep;  //save the current programStep so it can resume where it left off
       programStep=6;  //next step is strobeOff
       strobeOffTime=millis()+random(strobeTimeMin,strobeTimeMax);  //randomly choose how long the strobe will be on
@@ -208,14 +202,12 @@ void strobeOn(){  //this needs to save the program array in a different array an
     }
 }
 void strobeOff(){
-  if(millis()>=strobeOffTime){  //this will just hit the min every time but it will make it still work until I do the real strobe with the program array updates
+  if(millis()>=strobeOffTime){
     for(byte row=0;row<=5;row++){    //step through the RGB for position 1 and 2
-      for(byte col=0;col<=3;col++){
-         program[row][col]=lastProgram[row][col];  //reset the program to the pre-strobe values - this would be better if it added the strobetime to the numbers
-      }
+      program[row][0]=lastTargetBrightness[row];  //reset the program to the pre-strobe values - this would be better if it added the strobetime to the end time but that will require another long
     }
     programStep=oldProgramStep;  //resume where it was before the strobe
-    //digitalWrite(13, LOW);   //
+    //digitalWrite(13, LOW);   //debugging
   }
 }
 
@@ -232,6 +224,7 @@ void allShift(){  //color shifts all leds simultaneously to random colors this w
 void loop(){
 script(scriptID);  //the script function runs the collection of functions in the scriptID that is set in the current profile
 fader();  //the fader function changes brightness values to reach the target brightness in the program by the end time for the fade
+//fader();  //I think more calls to the fader might make for smoother fades, the script() function doesn't need to update anywhere near as frequently
 //interruptLoadCheck()  //for debugging
 //sramCheck();  //for debugging
 //debugBlink();  //for debugging
