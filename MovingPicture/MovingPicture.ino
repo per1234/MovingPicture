@@ -4,14 +4,14 @@ SOFTPWM_DEFINE_CHANNEL_INVERT( 0, DDRD, PORTD, PORTD0 );  //D0
 SOFTPWM_DEFINE_CHANNEL_INVERT( 1, DDRD, PORTD, PORTD1 );  //D1
 SOFTPWM_DEFINE_CHANNEL_INVERT( 2, DDRC, PORTC, PORTC4 );  //A4
 SOFTPWM_DEFINE_CHANNEL_INVERT( 3, DDRD, PORTD, PORTD2 );  //D2
-SOFTPWM_DEFINE_CHANNEL_INVERT( 4, DDRD, PORTD, PORTD3 );  //D3
+//SOFTPWM_DEFINE_CHANNEL_INVERT( 4, DDRD, PORTD, PORTD3 );  //D3
 SOFTPWM_DEFINE_CHANNEL_INVERT( 5, DDRD, PORTD, PORTD4 );  //D4
-SOFTPWM_DEFINE_CHANNEL_INVERT( 6, DDRD, PORTD, PORTD5 );  //D5
-SOFTPWM_DEFINE_CHANNEL_INVERT( 7, DDRD, PORTD, PORTD6 );  //D6
-SOFTPWM_DEFINE_CHANNEL_INVERT( 8, DDRB, PORTB, PORTB1 );  //D9
+//SOFTPWM_DEFINE_CHANNEL_INVERT( 6, DDRD, PORTD, PORTD5 );  //D5
+//SOFTPWM_DEFINE_CHANNEL_INVERT( 7, DDRD, PORTD, PORTD6 );  //D6
+//SOFTPWM_DEFINE_CHANNEL_INVERT( 8, DDRB, PORTB, PORTB1 );  //D9
 SOFTPWM_DEFINE_CHANNEL_INVERT( 9, DDRC, PORTC, PORTC0 );  //A0
-SOFTPWM_DEFINE_CHANNEL_INVERT( 10, DDRB, PORTB, PORTB3 );  //D11
-SOFTPWM_DEFINE_CHANNEL_INVERT( 11, DDRB, PORTB, PORTB2 );  //D10
+//SOFTPWM_DEFINE_CHANNEL_INVERT( 10, DDRB, PORTB, PORTB3 );  //D11
+//SOFTPWM_DEFINE_CHANNEL_INVERT( 11, DDRB, PORTB, PORTB2 );  //D10
 SOFTPWM_DEFINE_CHANNEL_INVERT( 12, DDRC, PORTC, PORTC3 );  //A3
 SOFTPWM_DEFINE_CHANNEL_INVERT( 13, DDRC, PORTC, PORTC2 );  //A2
 SOFTPWM_DEFINE_CHANNEL_INVERT( 14, DDRC, PORTC, PORTC1 );  //A1
@@ -32,8 +32,8 @@ const int valueTotalMinMaxSet = 70; //minimum sum of percentages of the RGB diod
 //int valueDiffMin=15;  //the minimum change in value of each color. not yet implemented
 
 const int valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet);  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on
-byte pos1[ledNum]={4,5};  //The postition 1 array - this contains the pin[] row numbers of the LEDs that make up the current pos1.
-byte pos1size=1; //the current number of items in the pos1 array(zero indexed) I can get rid of this with ARRAY_SIZE or something like that
+byte pos1[ledNum]={4};  //The postition 1 array - this contains the pin[] row numbers of the LEDs that make up the current pos1.
+byte pos1size=0; //the current number of items in the pos1 array(zero indexed) I can get rid of this with ARRAY_SIZE or something like that
 byte pos2[ledNum]={1,2,3}; 
 byte pos2size=2;  //I can get rid of this with ARRAY_SIZE or something like that
 byte valueRb=0;
@@ -56,39 +56,22 @@ void setup(){
   randomSeed(analogRead(0));  //makes the pseudorandom number sequence start at a different position each boot
 //  SoftPWMBegin();
   SoftPWM.begin( 90 );
+  pinMode(3, OUTPUT); 
+  pinMode(5, OUTPUT); 
+  pinMode(6, OUTPUT); 
+  pinMode(9, OUTPUT); 
+  pinMode(10, OUTPUT); 
+  pinMode(11, OUTPUT); 
 /*  for(byte row=0;row<=ledNum-1;row++){  //cycle through the position rows of the 2 dimensional pin array
     for(byte column=0;column<=2;column++){  //cycle through the 3 color columns of the 2 dimensional pin array
       SoftPWMSet(pin[row][column], 0); //create and turn off all pins
       SoftPWMSetPolarity(pin[row][column],SOFTPWM_INVERTED);  //configure SoftPWM in inverted mode to work with common anode RGB LEDs
     }
   }*/
-    pinMode(13, OUTPUT);     
 }
 
 void loop(){
   //the program
-  if(programStep==3){  //position one color shift
-    if(millis()>= program[3][1]){  //check if the fade for position 2 is complete
-      for(int f=0;f<=5;f++){
-        program[f][0] = 255;
-        long permilles=millis()+4000;
-        program[f][1] = permilles;  //[pos1R, pos1G, pos1B, pos2R, pos2G, pos2B][target brightness, end time, current brightness, last brightness change time]
-      }
-     programStep=4;
-       digitalWrite(13, HIGH);
-    } 
-  }
-  if(programStep==4){  //position one color shift
-    if(millis()>= program[3][1]){  //check if the fade for position 2 is complete
-      for(int f=0;f<=5;f++){
-        program[f][0] = 0;
-        long permilles=millis()+4000;
-        program[f][1] = permilles;  //[pos1R, pos1G, pos1B, pos2R, pos2G, pos2B][target brightness, end time, current brightness, last brightness change time]
-      }
-       programStep=3;
-         digitalWrite(13, LOW);
-    }
-  }
   if(programStep==0){  //position one color shift
     if(millis()>= program[3][1]){  //check if the fade for position 2 is complete
       for(byte k=0;k<=pos2size;k++){  //START position1 = position2
@@ -216,6 +199,9 @@ to do:
   -check for bug 
   -test other pwm options
 -check sram usage at various points in the sketch
+-smooth fade - the fade is way too fast at the start of the fade, need more brightness levels and some code 
+  -the lowest brightness 1/3? of the fade will be at a slower speed and the fade determiner needs to be adjusted to account for this so that it will still reach the target
+  -there needs to be a modifier on the fade speed that is 1 at the midpoint, less than 1 by a configurable percent before the midpoint of the fade and greater than 1 by the same amount after the midpoint of the fade, this way the fade will end up taking the same amount of time to get to the target 
 -if I'm sticking with the palatis pwm then I can get rid of the pins array, use the channelsize and brightness levels size functions
 -check the millis() overflow(I'm using long instead of unsigned long in the program) and make it overflow friendly
 -check the interrupt load and max out the pwm frequency
@@ -251,7 +237,8 @@ to do:
   -functions
   -check for unused variables
   -i could split the program array into 2 different arrays, one is target and current brightness(byte), the other is end and last brightness change time(long)
-maybe
+  -underclocking: I believe it would use less power at 8MHz if I can get it to still run at 5V but the pwm might need the faster speedmaybe
+  -use internal thermometer(secret thermometer library?) to have a safety cutoff if it gets too hot
   -burn sketch with external programmer with no bootloader on the chip for more memory and faster boot
   -PROGMEM - this stores variables? in flash - this seems too complicated
 */
