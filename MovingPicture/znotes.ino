@@ -12,9 +12,10 @@
   -random range within that range that changes on every powerup.
 -consecutive leds only in positions - it must choose a start led and number of leds and then create the position from the available leds consecutive to that start led
   -positions as a range rather than an array of leds. if the max value is less than the min value then that means it crosses the zero point of the circle
--scriptlet setup step instead of setting variables over and over
+-script setup step instead of setting variables over and over
+-minimum total number of RGBLEDs in positions - this would make it more consistently bright
 
--scriptlets - I can fill in extra memory with these and put different ones on each piece
+-scripts - I can fill in extra memory with these and put different ones on each piece
   -rainbow chase - the leds crossfade in a circle while color shifting through the spectrum
   -catscradle - the light jumps back and forth across the board to the opposite LED while rotating around the circle
   -interlaced crossfade - every other led around the circle lights and crossfades to the others
@@ -26,6 +27,8 @@
 
 -bugs:
   -the "off" leds in position1?(could be ones not in a position) have a brightness fluctuation at the very start
+  -leds start at 0(not zeroLEvel) with strobe addon
+  -allShift locks up after a while
   
 -maybe
   -create a stripped down version of the softPWM library and see if it will change memory usage
@@ -40,8 +43,7 @@
     -push toggles between standard, fixed color(rotary selects color), no movement all leds synched color shift, randomly triggered events/bonus tracks with rotary selector cycling through the options
 
 -Program strip down - coment out:
-  all unused scripts from the script() function
-  all unused scriptlet setup variables
-  all unused scriptlets - check to see if unused functions increase the size
-  all unused scriptlet components
+  all unused script setup variables
+  all unused scripts - check to see if unused functions increase the size
+  all unused script components
 */

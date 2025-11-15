@@ -143,7 +143,7 @@ void fader(){  //the current code only allows the fader to increment by 1 even i
 }
 
 void loop(){
-script(scriptID);  //the script function runs the collection of functions in the scriptID that is set in the current profile
+script();  //runs the functions currently uncommented in the profiles tab
 fader();  //the fader function changes brightness values to reach the target brightness in the program by the end time for the fade
 fader();  //I think more calls to the fader might make for smoother fades, the script() function doesn't need to update anywhere near as frequently
 //interruptLoadCheck()  //for debugging
