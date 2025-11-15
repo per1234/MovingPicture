@@ -1,5 +1,6 @@
+//this version attempts to use the hardware pwm enabled pins to reduce the software load but I think there could be an issue in the setup and pins might be getting double duty possibly
 #include <SoftPWM.h> //the SoftPWM library that contains all commands starting with SoftPWM
-const byte ledNum=5;  //the number of leds connected - I can get rid of this with ARRAY_SIZE or something like that
+const byte ledNum=5;  //the number of leds connected
 const byte pin[ledNum][3]={  //the pins each led is connected to. These must be in consecutive order. {r,g,b}. A0-A5=14-19,
   {0,1,18},
   {2,3,4},
@@ -7,18 +8,18 @@ const byte pin[ledNum][3]={  //the pins each led is connected to. These must be 
   {14,11,10},
   {17,16,15}
 };
-const int fadeDelayMaxSet = 18000;  //the longest time that it will color shift.
-const int fadeDelayMinSet = 5000;  //shortest shift time
-const int fadeDelayDiffMin = 8000;  //the minimum difference in the range of fade speeds
-const int valueTotalMinMinSet = 35; //minimum sum of percentages of the RGB diodes of an LED. This avoids it picking too dim colors.
-const int valueTotalMinMaxSet = 70; //minimum sum of percentages of the RGB diodes of an LED. This avoids it picking too dim colors.
+const int fadeDelayMaxSet = 10000;  //the longest time that it will color shift.
+const int fadeDelayMinSet = 800;  //shortest shift time
+const int fadeDelayDiffMin = 1000;  //the minimum difference in the range of fade speeds
+const int valueTotalMinMinSet = 90; //minimum sum of percentages of the RGB diodes of an LED. This avoids it picking too dim colors.
+const int valueTotalMinMaxSet = 200; //minimum sum of percentages of the RGB diodes of an LED. This avoids it picking too dim colors.
 //int valueDiffMin=15;  //the minimum change in value of each color. not yet implemented
 
 const int valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet);  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on
 byte pos1[ledNum]={3};  //The postition 1 array - this contains the pin[] row numbers of the LEDs that make up the current pos1.
-byte pos1size=0; //the current number of items in the pos1 array(zero indexed) I can get rid of this with ARRAY_SIZE or something like that
+byte pos1size=0; //the current number of items in the pos1 array(zero indexed)
 byte pos2[ledNum]={1,2}; 
-byte pos2size=1;  //I can get rid of this with ARRAY_SIZE or something like that
+byte pos2size=1;
 byte valueRb=0;
 byte valueGb=0;
 byte valueBb=0;
@@ -40,8 +41,13 @@ void setup(){
   SoftPWMBegin();
   for(byte row=0;row<=ledNum-1;row++){  //cycle through the position rows of the 2 dimensional pin array
     for(byte column=0;column<=2;column++){  //cycle through the 3 color columns of the 2 dimensional pin array
-      SoftPWMSet(pin[row][column], 0); //create and turn off all pins
-      SoftPWMSetPolarity(pin[row][column],SOFTPWM_INVERTED);  //configure SoftPWM in inverted mode to work with common anode RGB LEDs
+      if(pin[row][column]== 3 || pin[row][column]== 5 || pin[row][column]== 6 || pin[row][column]== 9 || pin[row][column]== 10 || pin[row][column]== 11){  //if it is a hardware PWM pin then set it up as such
+        pinMode(pin[row][column], OUTPUT); 
+      }
+      else{  //if not a hardware PWM pin then use SoftPWM not sure this is working correctly, case might be better?
+        SoftPWMSet(pin[row][column], 0); //create and turn off all pins
+        SoftPWMSetPolarity(pin[row][column],SOFTPWM_INVERTED);  //configure SoftPWM in inverted mode to work with common anode RGB LEDs
+      }
     }
   }
 }
@@ -135,12 +141,22 @@ void loop(){
           program[i][2]=program[i][2]+1;  //update the last brightness
           if(i<3){  //change brightness of position 1
             for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
-              SoftPWMSet(pin[pos1[j]][i], program[i][2]);  //change the brightness 
+              if(pin[pos1[j]][i] == 3 || pin[pos1[j]][i]== 5 || pin[pos1[j]][i]== 6 || pin[pos1[j]][i]== 9 || pin[pos1[j]][i]== 10 || pin[pos1[j]][i]== 11){  //if it is a hardware PWM pin then set it up as such
+                analogWrite(pin[pos1[j]][i], 255-program[i][2]);  //change the brightness 
+              }
+              else{
+                SoftPWMSet(pin[pos1[j]][i], program[i][2]);  //change the brightness 
+              }
             }
           }
           if(i>=3){  //change brightness of position 2
             for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
-              SoftPWMSet(pin[pos2[j]][i-3], program[i][2]);  //change the brightness
+              if(pin[pos2[j]][i-3]== 3 || pin[pos2[j]][i-3]== 5 || pin[pos2[j]][i-3]== 6 || pin[pos2[j]][i-3]== 9 || pin[pos2[j]][i-3]== 10 || pin[pos2[j]][i-3]== 11){  //if it is a hardware PWM pin then set it up as such
+                analogWrite(pin[pos2[j]][i-3], 255-program[i][2]);  //change the brightness 
+              }
+              else{
+                SoftPWMSet(pin[pos2[j]][i-3], program[i][2]);  //change the brightness 
+              }
             }
           }
         }
@@ -148,12 +164,22 @@ void loop(){
           program[i][2]=program[i][2]-1; //update the last brightness
           if(i<3){  //change brightness of position 1
             for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
-              SoftPWMSet(pin[pos1[j]][i], program[i][2]);  //change the brightness 
+              if(pin[pos1[j]][i]== 3 || pin[pos1[j]][i]== 5 || pin[pos1[j]][i]== 6 || pin[pos1[j]][i]== 9 || pin[pos1[j]][i]== 10 || pin[pos1[j]][i]== 11){  //if it is a hardware PWM pin then set it up as such
+                analogWrite(pin[pos1[j]][i], 255-program[i][2]);  //change the brightness 
+              }
+              else{
+                SoftPWMSet(pin[pos1[j]][i], program[i][2]);  //change the brightness 
+              }
             }
           }
           if(i>=3){  //change brightness of position 2
             for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
-              SoftPWMSet(pin[pos2[j]][i-3], program[i][2]);  //change the brightness
+              if(pin[pos2[j]][i-3]== 3 || pin[pos2[j]][i-3]== 5 || pin[pos2[j]][i-3]== 6 || pin[pos2[j]][i-3]== 9 || pin[pos2[j]][i-3]== 10 || pin[pos2[j]][i-3]== 11){  //if it is a hardware PWM pin then set it up as such
+                analogWrite(pin[pos2[j]][i-3], 255-program[i][2]);  //change the brightness 
+              }
+              else{
+                SoftPWMSet(pin[pos2[j]][i-3], program[i][2]);  //change the brightness 
+              }
             }
           }
         }
@@ -165,12 +191,9 @@ void loop(){
 
 /*
 to do:
--solve flicker!!!
-  -try to make it repeatable - all leds on?
-  -look into a higher pwm frequency - this could effect millis() and delay() but I could probably adjust the variables to account for that
-  -check for bug 
-  -test other pwm options
 -check sram usage at various points in the sketch
+-fix "glitch start" in library - high istead of LOW
+-look for solution to timer incompatibility causing flicker
 -check the frequency with video and if it has issues then try to change the frequency  
 -spectrum limitation - 3(?) different manually set ranges(Ra,Ga,Ba,Rb,Gb,Bb array) that allows me to give a custom palette to the piece and a random range within that range that changes on every powerup. the range can be inclusive as normal or exclusive if the max and min values are reversed.
   -the values will be used as a ratio of r:g:b and don't denote brightness
@@ -193,15 +216,14 @@ to do:
   -write value to the EPROM using the library so that it will be the same even when turned off - it only is rated for 100000 cycles so it should only write every certain amount of time and only if it has changed - research what the behavior will be after it is worn out and make the program still work
   -push toggles between standard, fixed color(rotary selects color), no movement all leds synched color shift, randomly triggered events/bonus tracks with rotary selector cycling through the options
 -optimization - there is flash(code) and sram(variables?) and the sketch must fit in the limits of both
-  -ARRAY_SIZE instead of ledNum, pos1size, pos2size - the position1=position2 section needs to resize the array so that if the new one is smaller then the old overflow will be removed
-  -let array sizes be automatically determined? - this will make the code a bit more flexible but I don't know if declaring the size is better for memory?
-  -use analogWrite() on all hardware pwm enabled pins?
+  -retest all software pwm options
+  -use analogWrite() on all hardware pwm enabled pins
   -remove softPWMsetPercent and fade code from SoftPWM library
   -use const for all constant variables
   -int>byte
   -functions
   -check for unused variables
-maybe
+  -declare array sizes?
   -burn sketch with external programmer with no bootloader on the chip for more memory and faster boot
-  -PROGMEM - this stores variables? in flash - this seems too complicated
+  -PROGMEM - this stores variables? in flash
 */
