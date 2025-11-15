@@ -9,9 +9,18 @@ void script(byte scriptID){
       strobe();
     break;
     case 2:
+      standard();
+      fadeUpBack();
+      allShiftRandom();
+    break;
+    case 3:  //woohoo!
+      standard();
+      fadeUpBack();
+      allShiftRandom();
       strobe();
-      fadeUp();
-      fadeDown();
+    break;
+    case 4:
+      allShift();
     break;
   }
 }

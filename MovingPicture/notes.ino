@@ -39,7 +39,7 @@
   -underclocking: I believe it would use less power at 8MHz if I can get it to still run at 5V but the pwm might need the faster speedmaybe
   -burn sketch with external programmer with no bootloader on the chip for more memory and faster boot
   -PROGMEM - this stores variables? in flash - this seems too complicated
-  -the printInterupt serial output in the softPWM library is way too verbose and uses a lot of memory, cut it down
+  -the printInterupt serial output in the softPWM library is way too verbose and uses a lot of memory, cut it down and I think it used a floating number for the interupt readout, it seems like it could be a percentage instead
 -maybe
   -use internal thermometer(secret thermometer library?) to have a safety cutoff if it gets too hot
   -rotary selector input

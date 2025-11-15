@@ -1,6 +1,8 @@
 //#include <MemoryFree.h>  //for debugging this library checks available sram - uncomment the lastCheckTime line, the function call in loop(), and the function in the function tab also
 //#define __DEBUG_SOFTPWM__ 1  //for debugging - define this before including SoftPWM.h for printInterruptLoad() to work. - uncomment the lastCheckTime line, the function call in loop(), and the function in the function tab also
 //long lastCheckTime;  //for debugging the last time the interrupt load or sram was printed
+//long debugBlinkNextTime;  //the last time the debug blink happened
+//byte debugBlinkState;  //is the debug led on or off
 #include <arduino_softpwm_master.h>  //the softPWM library
 //map the softPWM channels to the port and bit of the pins the leds are connected to, these must be in rgb consecutive order for each RGB LED and if the number of channels are changed the SOFTPWM_DEFINE_OBJECT() and ledNum parameters must be updated also
 SOFTPWM_DEFINE_CHANNEL_INVERT( 0, DDRD, PORTD, PORTD0 );  //D0
@@ -27,10 +29,13 @@ byte pos2[ledNum];  //The postition 1 array - this contains the numbers of the L
 byte pos2size;  //the current number of items in the pos2 array(zero indexed) - get rid of the zero index thing too confusing
 int fadeDelay;  //the length of time that the fade will occur over, should be moved to the various functions that need it(crossfade, shift, etc.)
 long program[6][4];  //[pos1R, pos1G, pos1B, pos2R, pos2G, pos2B][target brightness, end time, current brightness, last brightness change time]
+long lastProgram[6][4];  //used to store the previous program in the strobe function
 byte programStep=1;  //used to step through various different script actions
+byte oldProgramStep;  //used to store the previous programStep value
 int fadeDelayMax;  //this is randomly set in the initialize function
 int fadeDelayMin;  //this is randomly set in the initialize function
 int valueTotalMin;  //this is randomly set in the initialize function
 long strobeOffTime;  //the length of time the strobe is on
 byte strobeFlag;  //is the strobe on or off flag
 long strobeNextTime;  //the time until the next strobe;
+long fadeUpBackNextTime;  //the next time to do a fadeUpBack
