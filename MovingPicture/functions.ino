@@ -178,13 +178,12 @@ void sramCheck(){  //turns on led if there is less than the set value of free sr
 void debugBlink(){  //blinks pin 13
   if(millis()>=debugBlinkNextTime){
     if (debugBlinkState==0){
-      digitalWrite(13, HIGH);
+      digitalWrite(10, HIGH);
       debugBlinkNextTime=millis()+50;
       debugBlinkState=1;
     }
     else{
-      digitalWrite(13, LOW);
-      debugBlinkNextTime=millis()+500;
+      digitalWrite(10, LOW);      debugBlinkNextTime=millis()+500;
       debugBlinkState=0;
     }
   }

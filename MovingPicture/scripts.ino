@@ -93,12 +93,12 @@ void colorShift(){
   if(millis()>= program[0][1]){  //check if the previous program is complete
     newColor(2);  //set new color for position 2
     standardStep=1;  //switch to the crossfade
-    //digitalWrite(13, HIGH);  //for debugging
+    //digitalWrite(10, HIGH);  //for debugging
   }
 }
 
 void crossFade(){
-  if(millis()>=program[0][1]){  //check if the previous program is complete
+  if(millis()>=program[3][1]){  //check if the previous program is complete
     pos1equalsPos2();
     newPos2();  //new position 2
     newColor(2);  //new color on position 2
@@ -107,7 +107,7 @@ void crossFade(){
     }
     fadeOut();  //fade postition 1 to offLevel
     standardStep=0;  //switch back to the shift
-//      digitalWrite(13, LOW);  //for debugging
+    //digitalWrite(10, LOW);  //for debugging
   }
 }
 
