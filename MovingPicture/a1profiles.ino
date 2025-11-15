@@ -28,7 +28,7 @@ const byte offLevel=8;  //with 256 brightness levels the jump from 0 to 1 is too
 
 void script(){
   //add-ons:
-  fadeUpBack();  //locks up
+  fadeUpBack();  //works
   //allShiftRandom();  //locks up
   //strobe();  //works
   

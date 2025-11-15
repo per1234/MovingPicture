@@ -14,6 +14,7 @@
   -positions as a range rather than an array of leds. if the max value is less than the min value then that means it crosses the zero point of the circle
 -script setup step instead of setting variables over and over
 -minimum total number of RGBLEDs in positions - this would make it more consistently bright
+-programFinish() function that runs the if(millis()>= program[0][1] && millis()>= program[3][1]){ thing? - it's on every script component so this would make it easier to change but I don't know if it's better
 
 -scripts - I can fill in extra memory with these and put different ones on each piece
   -rainbow chase - the leds crossfade in a circle while color shifting through the spectrum

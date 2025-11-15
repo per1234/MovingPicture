@@ -116,6 +116,9 @@ void fillAllPos2(){
       pos2[pos2size]=i;
     }
   }
+  for(byte b=3;b<=5;b++){  //step through the position 2 program rows
+      program[b][2] = offLevel;  //set current brightness
+  }
 }
 
 void fader(){  //the current code only allows the fader to increment by 1 even if the program calls for faster, this seems like it enforces smooth fades over reaching the goal but will not work well for instant brightness change
