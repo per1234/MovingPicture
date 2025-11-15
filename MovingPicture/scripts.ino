@@ -4,10 +4,14 @@
 void standard(){  //shift/crossfade
   if(programControl==0){  //check if the main script has control
     if(standardStep==0){  //position one color shift
-      colorShift();
+      if(colorShift()==1){
+        standardStep=1;  //switch to the crossfade      
+      }
     }
     if(standardStep==1){  //crossfade position 1 to position2
-      crossFade();
+      if(crossFade()==1){
+        standardStep=0;  //switch to the crossfade
+      }
     }
   }
 }
@@ -26,11 +30,15 @@ void allShift(){  //color shifts all leds simultaneously to random colors this w
 
 void strobeMain(){  //sets the brightness levels to 0 for the maximum strobe only effect add color option
   if(programControl==0 || strobeStep>0){  //check if the main program has control, don't want to activate if another add-on has control
-    if(strobeStep==0){
-      strobeOn();
-    }
-    if(strobeStep==1){
-      strobeOffFull();
+    if(millis()>=strobeNextTime){  //time to turn on/off the strobe
+      if(strobeStep==0){
+        strobeOn();
+        strobeStep=1;
+      }
+      if(strobeStep==1){
+        strobeOffFull();
+        strobeStep=0;
+      }
     }
   }
 }
@@ -39,11 +47,15 @@ void strobeMain(){  //sets the brightness levels to 0 for the maximum strobe onl
 
 void strobe(){  //randomly turns all leds on full and then back to the previous value and program add random color option - this doesn't look good on scripts with lots of all-led on time because the strobe only has a dramatic effect when there is a significant contrast, otherwise it just looks like a hiccup in the program
   if(programControl==0 || strobeStep>0){  //check if the main program has control, don't want to activate if another add-on has control
-    if(strobeStep==0){
-      strobeOn();
-    }
-    if(strobeStep==1){
-      strobeOff();
+    if(millis()>=strobeNextTime){
+      if(strobeStep==0){
+        strobeOn();
+        strobeStep=1;
+      }
+      if(strobeStep==1){
+        strobeOff();
+        strobeStep=0;        
+      }
     }
   }
 }
@@ -63,6 +75,8 @@ void fadeUpBack(){  //randomly fades all leds to full brightness and then choose
       if(fadeUpBackStep==2){
         if(fadeBack()==1){
           fadeUpBackStep=0;
+          fadeUpBackNextTime=millis()+random(fadeUpBackDelayMin,fadeUpBackDelayMax)+fadeDelay;  //when the next fadeUpBack will occur
+          programControl=0;  //give the program control back to the main script
         }
       }
     }
@@ -77,7 +91,7 @@ void allShiftRandom(){  //fades all leds up to a random color and then shifts th
         allShiftRandomStep=1;
         allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift used only by the allShiftRandom add-on
         pos1equalsPos2;
-        //fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1 - this is what is causing the problem
+        fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1 - this is what is causing the problem
         digitalWrite(10, HIGH);  //for debugging    
       }
       if(allShiftRandomStep<=allShiftRandomIterations){
@@ -89,6 +103,7 @@ void allShiftRandom(){  //fades all leds up to a random color and then shifts th
         if(fadeBack()==1){
           allShiftRandomNextTime=millis()+random(allShiftRandomDelayMin,allShiftRandomDelayMax)+fadeDelay;
           allShiftRandomStep=0;  //reset for next time
+          programControl=0;  //give the program control back to the main script
           digitalWrite(10, LOW);  //for debugging
         }    
       }
@@ -112,15 +127,18 @@ byte allShiftOnce(){
   }
 }
 
-void colorShift(){  //fades to a different color on position 2
+byte colorShift(){  //fades to a different color on position 2
   if(millis()>= program[0][1] && millis()>= program[3][1]){  //check if the previous program is complete
     newColor(2);  //set new color for position 2
-    standardStep=1;  //switch to the crossfade
     //digitalWrite(10, LOW);  //for debugging
+    return 1;
+  }
+  else{
+    return 0;
   }
 }
 
-void crossFade(){  //fades out position 1 and fades position 2 to a new color
+byte crossFade(){  //fades out position 1 and fades position 2 to a new color
   if(millis()>= program[0][1] && millis()>=program[3][1]){  //check if the previous program is complete
     pos1equalsPos2();
     newPos2();  //new position 2
@@ -129,8 +147,11 @@ void crossFade(){  //fades out position 1 and fades position 2 to a new color
       program[i][2]=offLevel;  //set the current brightness level for position 2 to off
     }
     fadeOutPos1();  //fade postition 1 to offLevel
-    standardStep=0;  //switch back to the colorShift
     //digitalWrite(10, HIGH);  //for debugging
+    return 1;
+  }
+  else{
+    return 0;
   }
 }
 
@@ -159,8 +180,6 @@ byte fadeBack(){  //this picks new positions and a new color and fades position 
     //fillAllPos2();  //new position 2 - this needs to take all the free pins
     newColor(2);  //new color for position 2
     fadeOutPos1();  //fade out position 1
-    fadeUpBackNextTime=millis()+random(fadeUpBackDelayMin,fadeUpBackDelayMax)+fadeDelay;  //when the next fadeUpBack will occur
-    programControl=0;  //give the program control back to the main script
     standardStep=0;  //next step is the colorShift
     digitalWrite(10, LOW);  //for debugging
     return 1;  //this lets the script know that the fadeback has been programmed
@@ -171,46 +190,38 @@ byte fadeBack(){  //this picks new positions and a new color and fades position 
 }
 
 void strobeOn(){
-  if(millis()>=strobeNextTime){  //time to turn on the strobe
-    for(byte i=0;i<=5;i++){    //step through the program rows for position 1 and 2
-      lastTargetBrightness[i]=program[i][0];  //save the target brightness for the 6 rows
-      //Serial.println(program[i][0]);
-      program[i][0]=program[i][2];  //set the target brightness to the current brightness to disable the fader while the strobe is on
-    }
-    for(byte i=0;i<SoftPWM.size();i++){  //turn them all on
-      SoftPWM.set(i,SoftPWM.brightnessLevels()-1);
-    }
-    programControl=1;  //this takes control of the program from the main script
-    strobeStep=1;  //next step is strobeOff/strobeOffFull
-    strobeTime=random(strobeTimeMin,strobeTimeMax);  //chose the lenth of time the strobe will be on
-    strobeNextTime=millis()+strobeTime;
+  for(byte i=0;i<=5;i++){    //step through the program rows for position 1 and 2
+    lastTargetBrightness[i]=program[i][0];  //save the target brightness for the 6 rows
+    //Serial.println(program[i][0]);
+    program[i][0]=program[i][2];  //set the target brightness to the current brightness to disable the fader while the strobe is on
   }
+  for(byte i=0;i<SoftPWM.size();i++){  //turn them all on
+    SoftPWM.set(i,SoftPWM.brightnessLevels()-1);
+  }
+  programControl=1;  //this takes control of the program from the main script
+  strobeTime=random(strobeTimeMin,strobeTimeMax);  //chose the lenth of time the strobe will be on
+  strobeNextTime=millis()+strobeTime;
 }
 
 void strobeOffFull(){  //turns the pins all off to 0 for use with the strobeMain for the maximum strobe effect
-  if(millis()>=strobeNextTime){
-    for(byte i=0;i<SoftPWM.size();i++){  //turn them all off
-      SoftPWM.set(i,0);
-    }
-    strobeStep=0;  //reset for next time
-    programControl=0;  //give control back to the main script
-    strobeNextTime=millis()+random(strobeDelayMin,strobeDelayMax);  //randomly choose the next time it will strobe
+  for(byte i=0;i<SoftPWM.size();i++){  //turn them all off
+    SoftPWM.set(i,0);
   }
+  programControl=0;  //give control back to the main script
+  strobeNextTime=millis()+random(strobeDelayMin,strobeDelayMax);  //randomly choose the next time it will strobe
 }
 
 void strobeOff(){
-  if(millis()>=strobeNextTime){
-    for(byte i=0;i<=5;i++){    //step through the RGB for position 1 and 2
-      program[i][0]=lastTargetBrightness[i];  //reset the program to the pre-strobe values
-      program[i][1]=program[i][1]+strobeTime;  //add on the length of time the strobe was on to the fade end time in the program
-    //Serial.println(program[row][0]);
-    }
-    setter();  //set all leds back to their previous brightness
-    strobeStep=0;  //reset for next time
-    programControl=0;  //give control back to the main script    
-    strobeNextTime=millis()+random(strobeDelayMin,strobeDelayMax);  //randomly choose the next time it will strobe
-    //digitalWrite(13, HIGH);   //debugging
+  for(byte i=0;i<=5;i++){    //step through the RGB for position 1 and 2
+    program[i][0]=lastTargetBrightness[i];  //reset the program to the pre-strobe values
+    program[i][1]=program[i][1]+strobeTime;  //add on the length of time the strobe was on to the fade end time in the program
+  //Serial.println(program[row][0]);
   }
+  setter();  //set all leds back to their previous brightness
+  strobeStep=0;  //reset for next time
+  programControl=0;  //give control back to the main script    
+  strobeNextTime=millis()+random(strobeDelayMin,strobeDelayMax);  //randomly choose the next time it will strobe
+  //digitalWrite(13, HIGH);   //debugging
 }
 
 void fadeOutPos1(){ //sets position 1 brightness to 1, make sure to do a newColor() or otherwise set the fadeDelay first

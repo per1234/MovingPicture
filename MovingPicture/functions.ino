@@ -69,7 +69,7 @@ void setter(){  //sets the RGBLEDs to their current program values - currently u
 }
 
 void pos1equalsPos2(){  //copy old position 2 to position 1
-  for(byte k=0;k<=pos2size;k++){  //START position1 = position2
+  for(byte k=0;k<=pos2size;k++){
     pos1[k]=pos2[k];  
   }
   pos1size=pos2size;
@@ -100,11 +100,10 @@ void newPos2(){  //New Position 2 - chooses the size of the new position and whi
   }
 }
 
-void fillAllPos2(){
-  byte fillAllPos2flag=0;
-  byte fillAllPos2count=0;
+void fillAllPos2(){  //puts all the RGBLEDs not already in position 1 in postition 2
   pos2size=0;
-  for(byte i=0;i<=SoftPWM.size()/3-1;i++){
+  fillAllPos2count=0;
+  for(byte i=0;i<=SoftPWM.size()/3-1;i++){  //step through all the RGBLEDs
     fillAllPos2flag=0;
     for(byte j=0;j<=pos1size;j++){
       if(pos1[j]==i){  //the RGBLED is in position 1

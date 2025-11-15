@@ -15,6 +15,7 @@
 -script setup step instead of setting variables over and over
 -minimum total number of RGBLEDs in positions - this would make it more consistently bright
 -programFinish() function that runs the if(millis()>= program[0][1] && millis()>= program[3][1]){ thing? - it's on every script component so this would make it easier to change but I don't know if it's better
+-combine nested if statements into one line wherever possible
 
 -scripts - I can fill in extra memory with these and put different ones on each piece
   -rainbow chase - the leds crossfade in a circle while color shifting through the spectrum
@@ -31,6 +32,7 @@
   -allShiftRandom locks up
   -brightness fluctuations
   -standard doesn't appear to be doing the colorShift, only crossfade
+  -it almost looks like it bounces down below the offLevel, maybe make a safeguard so that the fader can never go below offLevel or over 255
   
 -maybe
   -create a stripped down version of the softPWM library and see if it will change memory usage
