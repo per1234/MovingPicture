@@ -112,7 +112,7 @@ void crossFade(){
     for(byte i=3;i<=5;i++){
       program[i][2]=offLevel;  //set the current brightness level for position 2 to off
     }
-    fadeOut();  //fade postition 1 to brightness 1
+    fadeOut();  //fade postition 1 to offLevel
     standardStep=0;  //switch back to the shift
 //      digitalWrite(13, LOW);  //for debugging
   }

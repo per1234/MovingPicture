@@ -3,7 +3,10 @@ void setup(){
   //Serial.begin(9600);  //for debugging
   SoftPWM.begin(120);  //start the SoftPWM and set the PWM frequency
   for(byte softPWMchannel=0;softPWMchannel<=SoftPWM.size();softPWMchannel++){  //cycle through all the softPWM channels
-    SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
+    SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at the offLevel right from the start - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
+  }
+  for(byte i=0;i<=5;i++){  //step through the program rows
+    program[i][2]=offLevel;  //set the current brightness in the program to offLevel
   }
   //I'm setting these variables up here because the randomSeed(analogRead(0)) doesn't work at the top of the sketch where I'm declaring variables for some reason and I need to do the randomSeed(analogRead(0)) before picking random variables
   fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);  //the maximum bound of the rendomly chosen length of time that the fade will occur over
@@ -33,7 +36,7 @@ void newColor(byte positionID){  //set the new color program for the given posit
 }
 
 void setter(){  //sets the RGBLEDs to their current program values - currently used for recovery from the strobe() add-on
-  byte setterFlag;
+  byte setterFlag=0;
   for(byte i=0;i<=2;i++){
     for(byte j=0;j<=pos1size;j++){
       SoftPWM.set(pos1[j]*3+i, program[i][2]);
