@@ -85,3 +85,4 @@ unsigned long fadeUpBackNextTime;  //the next time to do a fadeUpBack
 byte allShiftRandomStep;  //the current step of the allShiftRandom add-on script
 unsigned long allShiftRandomNextTime;  //the next time the allShiftRandom add-on script will run
 byte allShiftRandomIterations;  //the number of times the current allShiftRandom will color shift
+

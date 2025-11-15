@@ -101,8 +101,8 @@ void newPos2(){  //New Position 2 - chooses the size of the new position and whi
 }
 
 void fillAllPos2(){
-  byte fillAllPos2flag;
-  byte fillAllPosCount;
+  byte fillAllPos2flag=0;
+  byte fillAllPos2count=0;
   pos2size=0;
   for(byte i=0;i<=SoftPWM.size()/3-1;i++){
     fillAllPos2flag=0;
@@ -112,7 +112,7 @@ void fillAllPos2(){
       }
     }
     if(fillAllPos2flag==0){  //the RGBLED wasn't in position 1
-      pos2size=fillAllPosCount++;  //this has to be set up weird like this because of the zero indexed pos2size
+      pos2size=fillAllPos2count++;  //this has to be set up weird like this because of the zero indexed pos2size
       pos2[pos2size]=i;
     }
   }
