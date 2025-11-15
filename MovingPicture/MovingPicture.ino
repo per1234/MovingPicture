@@ -5,44 +5,45 @@ SOFTPWM_DEFINE_CHANNEL_INVERT( 1, DDRD, PORTD, PORTD1 );  //D1
 SOFTPWM_DEFINE_CHANNEL_INVERT( 2, DDRC, PORTC, PORTC4 );  //A4
 SOFTPWM_DEFINE_CHANNEL_INVERT( 3, DDRD, PORTD, PORTD2 );  //D2
 //SOFTPWM_DEFINE_CHANNEL_INVERT( 4, DDRD, PORTD, PORTD3 );  //D3
-SOFTPWM_DEFINE_CHANNEL_INVERT( 5, DDRD, PORTD, PORTD4 );  //D4
+SOFTPWM_DEFINE_CHANNEL_INVERT( 4, DDRD, PORTD, PORTD4 );  //D4
 //SOFTPWM_DEFINE_CHANNEL_INVERT( 6, DDRD, PORTD, PORTD5 );  //D5
 //SOFTPWM_DEFINE_CHANNEL_INVERT( 7, DDRD, PORTD, PORTD6 );  //D6
 //SOFTPWM_DEFINE_CHANNEL_INVERT( 8, DDRB, PORTB, PORTB1 );  //D9
-SOFTPWM_DEFINE_CHANNEL_INVERT( 9, DDRC, PORTC, PORTC0 );  //A0
+SOFTPWM_DEFINE_CHANNEL_INVERT( 5, DDRC, PORTC, PORTC0 );  //A0
 //SOFTPWM_DEFINE_CHANNEL_INVERT( 10, DDRB, PORTB, PORTB3 );  //D11
 //SOFTPWM_DEFINE_CHANNEL_INVERT( 11, DDRB, PORTB, PORTB2 );  //D10
-SOFTPWM_DEFINE_CHANNEL_INVERT( 12, DDRC, PORTC, PORTC3 );  //A3
-SOFTPWM_DEFINE_CHANNEL_INVERT( 13, DDRC, PORTC, PORTC2 );  //A2
-SOFTPWM_DEFINE_CHANNEL_INVERT( 14, DDRC, PORTC, PORTC1 );  //A1
-SOFTPWM_DEFINE_OBJECT_WITH_BRIGHTNESS_LEVELS( 15, 1000 );
-const byte ledNum=(SoftPWM.size()+6)/3;  //the number of leds connected - softPWM pins + 6 hardPWM pins/3 pins/led
-const byte pin[][3]={  //the pins each led is connected to. These must be in consecutive order. {r,g,b}. A0-A5=14-19,
+SOFTPWM_DEFINE_CHANNEL_INVERT( 6, DDRC, PORTC, PORTC3 );  //A3
+SOFTPWM_DEFINE_CHANNEL_INVERT( 7, DDRC, PORTC, PORTC2 );  //A2
+SOFTPWM_DEFINE_CHANNEL_INVERT( 8, DDRC, PORTC, PORTC1 );  //A1
+SOFTPWM_DEFINE_OBJECT_WITH_BRIGHTNESS_LEVELS( 9, 1000 );
+const byte pin[][3]={  //the pins each led is connected to. These must be in consecutive order. {r,g,b}. 100 indexed=hardPWM enabled pin
   {0,1,2},
-  {3,4,5},
-  {6,7,8},
-  {9,10,11},
-  {12,13,14}
+  {3,103,4},
+  {105,106,109},
+  {5,111,110},
+  {6,7,8}
 };
-const int fadeDelayMaxSet = 18000;  //the longest time that it will color shift.
-const int fadeDelayMinSet = 5000;  //shortest shift time
-const int fadeDelayDiffMin = 8000;  //the minimum difference in the range of fade speeds
-const int valueTotalMinMinSet = 10; //Minimum bound of the randomly chosen minimum percent(not value) brightness of the RGB diodes of an LED(100=all full on). This avoids it picking too dim colors.
-const int valueTotalMinMaxSet = 20; //Maximum bound of the randomly chosen minimum percent(not value) brightness of the RGB diodes of an LED(100=all full on). This avoids it picking too dim colors.
-//int valueDiffMin=15;  //the minimum change in value of each color. not yet implemented
+const byte ledNum=sizeof(pin)/3;  //the number of RGB leds connected - this can be incorporated into the code with sizeof()
+const int fadeDelayMaxSet = 18000;  //the longest time that it will color shift.//change to unsigned
+const int fadeDelayMinSet = 5000;  //shortest shift time//change to unsigned
+const int fadeDelayDiffMin = 8000;  //the minimum difference in the range of fade speeds//change to unsigned
+const int valueTotalMinMinSet = 10; //Minimum bound of the randomly chosen minimum percent(not value) brightness of the RGB diodes of an LED(100=all full on). This avoids it picking too dim colors.//change to unsigned
+const int valueTotalMinMaxSet = 20; //Maximum bound of the randomly chosen minimum percent(not value) brightness of the RGB diodes of an LED(100=all full on). This avoids it picking too dim colors.//change to unsigned
+//const int valueDiffMinMinSet=6;  //the minimum change in percent of each color. not yet implemented//change to unsigned
+//const int valueDiffMinMaxSet=12;  //the minimum change in percent of each color. not yet implemented//change to unsigned
 
-const int valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet);  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on
-byte pos1[]={4};  //The postition 1 array - this contains the pin[] row numbers of the LEDs that make up the current pos1.
-byte pos1size=0; //the current number of items in the pos1 array(zero indexed) I can get rid of this with ARRAY_SIZE or something like that
-byte pos2[]={1,2,3}; 
-byte pos2size=2;  //I can get rid of this with ARRAY_SIZE or something like that
-int valueRb=0;
-int valueGb=0;
-int valueBb=0;
-int fadeDelay;
-const int fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);
-const int fadeDelayMin=random(fadeDelayMinSet, fadeDelayMax - fadeDelayDiffMin);
-long program[6][4]={  //[pos1R, pos1G, pos1B, pos2R, pos2G, pos2B][target brightness, end time, current brightness, last brightness change time]
+const int valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet);  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on change to unsigned
+byte pos1[ledNum];  //The postition 1 array - this contains the pin[] row numbers of the LEDs that make up the current pos1.
+byte pos1size; //the current number of items in the pos1 array(zero indexed) I can get rid of this with ARRAY_SIZE or something like that
+byte pos2[ledNum]={1,2,3}; 
+byte pos2size=sizeof(pos2)-1;  //I can get rid of this by incorporating sizeof() into the code below
+int valueRb=0;  //change to unsigned
+int valueGb=0;  //change to unsigned
+int valueBb=0;  //change to unsigned
+int fadeDelay;  //change to unsigned
+const int fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);  //change to unsigned
+const int fadeDelayMin=random(fadeDelayMinSet, fadeDelayMax - fadeDelayDiffMin);  //change to unsigned
+long program[][4]={  //[pos1R, pos1G, pos1B, pos2R, pos2G, pos2B][target brightness, end time, current brightness, last brightness change time]
   {0,0,0,0},
   {0,0,0,0},
   {0,0,0,0},
@@ -56,12 +57,14 @@ void setup(){
   randomSeed(analogRead(0));  //makes the pseudorandom number sequence start at a different position each boot
   //  SoftPWMBegin();
   SoftPWM.begin( 90 );
-  pinMode(3, OUTPUT); 
-  pinMode(5, OUTPUT); 
-  pinMode(6, OUTPUT); 
-  pinMode(9, OUTPUT); 
-  pinMode(10, OUTPUT); 
-  pinMode(11, OUTPUT); 
+  for(byte row=0;row<sizeof(pin)/3;row++){
+    for(byte col=0;col<=2;col++){
+      if(pin[row][col]>=100){
+        pinMode(pin[row][col]-100, OUTPUT); 
+        digitalWrite(pin[row][col]-100, HIGH);
+      }
+    }
+  }
   /*  for(byte row=0;row<=ledNum-1;row++){  //cycle through the position rows of the 2 dimensional pin array
    for(byte column=0;column<=2;column++){  //cycle through the 3 color columns of the 2 dimensional pin array
    SoftPWMSet(pin[row][column], 0); //create and turn off all pins
@@ -99,6 +102,7 @@ void loop(){
       program[1][1]=millis()+fadeDelay;      
       program[2][1]=millis()+fadeDelay;
       programStep=1;
+                digitalWrite(13, HIGH);
     }
   }
   if(programStep==1){  //crossfade position 1 to position2
@@ -148,6 +152,7 @@ void loop(){
       program[4][3]=millis();      
       program[5][3]=millis();
       programStep=0;
+                digitalWrite(13, LOW);
     }
   }
 
@@ -159,13 +164,23 @@ void loop(){
           program[i][2]=program[i][2]+1;  //update the last brightness
           if(i<3){  //change brightness of position 1
             for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
-              SoftPWM.set(pin[pos1[j]][i], program[i][2]);  //change the brightness 
+               if(pin[pos1[j]][i]>=100){
+                analogWrite(pin[pos2[j]][i], 255-255*program[i][2]/SoftPWM.brightnessLevels());
+              }
+              else{
+                SoftPWM.set(pin[pos1[j]][i], program[i][2]);  //change the brightness 
               //SoftPWMSet(pin[pos1[j]][i], program[i][2]);  //change the brightness 
+              }
             }
           }
           if(i>=3){  //change brightness of position 2
             for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
-              SoftPWM.set(pin[pos2[j]][i-3], program[i][2]);  //change the brightness
+              if(pin[pos2[j]][i-3]>=100){
+                analogWrite(pin[pos2[j]][i-3], 255-255*program[i][2]/SoftPWM.brightnessLevels());
+              }
+              else{
+                SoftPWM.set(pin[pos2[j]][i-3], program[i][2]);  //change the brightness
+              }
               //SoftPWMSet(pin[pos2[j]][i-3], program[i][2]);  //change the brightness              
             }
           }
@@ -174,14 +189,24 @@ void loop(){
           program[i][2]=program[i][2]-1; //update the last brightness
           if(i<3){  //change brightness of position 1
             for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
-              SoftPWM.set(pin[pos1[j]][i], program[i][2]);  //change the brightness
+              if(pin[pos1[j]][i]>=100){
+                analogWrite(pin[pos2[j]][i], 255-255*program[i][2]/SoftPWM.brightnessLevels());
+              }
+              else{
+                SoftPWM.set(pin[pos1[j]][i], program[i][2]);  //change the brightness
+              }
               //SoftPWMSet(pin[pos1[j]][i], program[i][2]);  //change the brightness               
             }
           }
           if(i>=3){  //change brightness of position 2
             for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
-              //SoftPWMSet(pin[pos2[j]][i-3], program[i][2]);  //change the brightness
-              SoftPWM.set(pin[pos2[j]][i-3], program[i][2]);  //change the brightness              
+              if(pin[pos2[j]][i-3]>=100){
+                analogWrite(pin[pos2[j]][i-3], 255-255*program[i][2]/SoftPWM.brightnessLevels());
+              }
+              else{
+                 //SoftPWMSet(pin[pos2[j]][i-3], program[i][2]);  //change the brightness
+                SoftPWM.set(pin[pos2[j]][i-3], program[i][2]);  //change the brightness              
+              }
             }
           }
         }
