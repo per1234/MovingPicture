@@ -1,19 +1,19 @@
 /*
--
-streamline the fader code! 
--many of the setup variables could be unsigned int to allow for a wider range of settings
 -max pwm frequency without overloading the interrupt
 -smooth fade - the fade is way too fast at the start of the fade
   -need more brightness levels but the softPWM only wants to do 256 - I have the new color values in bytes also now so they need to be changed to int if it is increased
   -the lowest brightness 1/3? of the fade will be at a slower speed and the fade determiner needs to be adjusted to account for this so that it will still reach the target
   -there needs to be a modifier on the fade speed that is 1 at the midpoint, less than 1 by a configurable percent before the midpoint of the fade and greater than 1 by the same amount after the midpoint of the fade, this way the fade will end up taking the same amount of time to get to the target 
   -if I can get a smooth transition to 0 then make 0 the minimum value instead of 1 like I have now
--check the millis() overflow(I'm using long instead of unsigned long in the program) and make it overflow friendly - long will hold millis up to 24 days but for the lights it needs to go forever.
+-make it millis() overflow friendly - long will hold millis up to 24 days but for the lights it needs to go forever.
 -find compatible video frequency
--spectrum limitation - 3(?) different manually set ranges(Ra,Ga,Ba,Rb,Gb,Bb array) that allows me to give a custom palette to the piece and a random range within that range that changes on every powerup. the range can be inclusive as normal or exclusive if the max and min values are reversed.
+-spectrum limitation - 2d array (Ra,Ga,Ba,Rb,Gb,Bb), each row defines a range of colors, the newColor() function randomly picks a row of this array(to disable have only one row with the full range) and limits the random colors picked to that range - this allows me to give a custom palette to the piece
   -the values will be used as a ratio of r:g:b and don't denote brightness
+  -random range within that range that changes on every powerup.
 -consecutive leds only in positions - it must choose a start led and number of leds and then create the position from the available leds consecutive to that start led
   -positions as a range rather than an array of leds. if the max value is less than the min value then that means it crosses the zero point of the circle
+-scriptlet setup step instead of setting variables over and over
+
 -scriptlets - I can fill in extra memory with these and put different ones on each piece
   -rainbow chase - the leds crossfade in a circle while color shifting through the spectrum
   -catscradle - the light jumps back and forth across the board to the opposite LED while rotating around the circle
@@ -22,32 +22,23 @@ streamline the fader code!
   -heartbeat
   -most on and randomly turn off leds(random5Ledonoff with fade instead of on/off)
   -ministrobe - 3 different RGBs quickly turned full on and off in rapid series
+  -moving position strobe where each strobe pulse is different random consecutive RGBLEDs - this will be less bright
+
+-bugs:
+  -the "off" leds in position1?(could be ones not in a position) have a brightness fluctuation at the very start
   
--optimization - there is flash(code) and sram(variables?) and the sketch must fit in the limits of both
-  -create a stripped down version of the softPWM library and see if it will change memory usage
-  -use const for all constant variables
-  -long>int>byte
-  -unsigned time variables if possible to allow more time before the rollover
-  -functions
-  -check for unused variables
-  -i could split the program array into 2 different arrays, one is target and current brightness(byte), the other is end and last brightness change time(long)
-  -underclocking: I believe it would use less power at 8MHz if I can get it to still run at 5V but the pwm might need the faster speedmaybe
-  -burn sketch with external programmer with no bootloader on the chip for more memory and faster boot
-  -PROGMEM - this stores variables? in flash - this seems too complicated
-  -the printInterupt serial output in the softPWM library is way too verbose and uses a lot of memory, cut it down and I think it used a floating number for the interupt readout, it seems like it could be a percentage instead
-  -work on the fader code it can be cut down a lot
-  -call fader() more frequently as it needs to work faster than script()
-  -scriptlet setup step instead of setting variables over and over
-  -try the delay version of the library again to confirm that it is a visible delay between channels
 -maybe
+  -create a stripped down version of the softPWM library and see if it will change memory usage
+    -the printInterupt serial output in the softPWM library is way too verbose and uses a lot of memory, cut it down and I think it used a floating number for the interupt readout, it seems like it could be a percentage instead
+  -i could split the program array into 2 different arrays, one is target and current brightness(byte), the other is end and last brightness change time(long)
+  -underclocking: I believe it would use less power at 8MHz if I can get it to still run at 5V but the pwm might need the faster speed
   -use internal thermometer(secret thermometer library?) to have a safety cutoff if it gets too hot
   -rotary selector input
     -bonus tracks - using the rotary encoder you can access these events by rotating way past the fastest setting(or just have it as an option in the push button menu and then turn to control speed) and then you can select the randomly triggered event to run continuously
     -interrupt system?
     -write value to the EPROM using the library so that it will be the same even when turned off - it only is rated for 100000 cycles so it should only write every certain amount of time and only if it has changed - research what the behavior will be after it is worn out and make the program still work
     -push toggles between standard, fixed color(rotary selects color), no movement all leds synched color shift, randomly triggered events/bonus tracks with rotary selector cycling through the options
-    -have a step counter on loops that may lock up and have a reset function that restarts the script if the couter gets too high
-    -moving position strobe where each strobe pulse is different random consecutive RGBLEDs - this will be less bright
+
 -Program strip down - coment out:
   all unused scripts from the script() function
   all unused scriptlet setup variables

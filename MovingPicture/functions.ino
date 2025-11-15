@@ -9,14 +9,14 @@ void setup(){
   //Serial.begin(9600);  //for debugging
   SoftPWM.begin(120);  //start the SoftPWM and set the PWM frequency
   for(byte softPWMchannel=0;softPWMchannel<=SoftPWM.size();softPWMchannel++){  //cycle through all the softPWM channels
-      SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
+    SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
   }
   //I'm setting these variables up here because the randomSeed(analogRead(0)) doesn't work at the top of the sketch where I'm declaring variables for some reason and I need to do the randomSeed(analogRead(0)) before picking random variables
   fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);  //the maximum bound of the rendomly chosen length of time that the fade will occur over
   fadeDelayMin=random(fadeDelayMinSet, fadeDelayMax - fadeDelayDiffMin);  //the minimum bound of the rendomly chosen length of time that the fade will occur over
-  valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet)*(SoftPWM.brightnessLevels()-1)*3/100;  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on - converts from a percent to a this should be set up to work with different numbers of brightness levels
-  newPos();
-  pos1equalsPos2();
+  valueTotalMin=random(valueTotalMinMinSet,valueTotalMinMaxSet)*(SoftPWM.brightnessLevels()-1)*3/100;  //rendomly picks the valueTotalMin from the set range so that there will be a different minimum brightness each power on - converts from a percent to brightness levels
+  newPos();  //it needs a position2 for the standard scriptlat to work
+  pos1equalsPos2();  //probably not necessary but it seems a good idea to start with 2 positions full
   newPos();
 }
 
@@ -145,7 +145,7 @@ void fader(){  //the current code only allows the fader to increment by 1 even i
 void loop(){
 script(scriptID);  //the script function runs the collection of functions in the scriptID that is set in the current profile
 fader();  //the fader function changes brightness values to reach the target brightness in the program by the end time for the fade
-//fader();  //I think more calls to the fader might make for smoother fades, the script() function doesn't need to update anywhere near as frequently
+fader();  //I think more calls to the fader might make for smoother fades, the script() function doesn't need to update anywhere near as frequently
 //interruptLoadCheck()  //for debugging
 //sramCheck();  //for debugging
 //debugBlink();  //for debugging

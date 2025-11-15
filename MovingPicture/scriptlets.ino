@@ -121,7 +121,7 @@ void crossFade(){
 }
 
 void fadeUp(){  //set the target brightness to 255 for all leds and the fade end time to a random length of time
-  if(standardStep==1){
+  if(standardStep==1){  //start after the color shift on the standard scriptlet
     if(millis()>= program[0][1]){  //check if the fade is complete
       pos1equalsPos2();
       fillAllPos2();  //make sure all RGBLEDs are in position 1 or position 2
@@ -141,7 +141,6 @@ void fadeBack(){  //this picks new positions and a new color and fades one posit
     pos1equalsPos2(); //fills position 1
     fillAllPos2();  //new position 2 - this needs to take all the free pins
     newColor(2);  //new color for position 2
-    
     fadeOut();  //fade out position 1
     fadeUpBackNextTime=millis()+random(fadeUpBackDelayMin,fadeUpBackDelayMax);  //when the next fadeUpBack will occur
     fadeUpBackStep=0;  //reset for next time
