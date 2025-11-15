@@ -14,7 +14,13 @@ void standard(){  //shift/crossfade
 
 void allShift(){  //color shifts all leds simultaneously to random colors this will most likely not work with standard()
   if(programControl==0){  //check if the main program has control
-    allShiftOnce();
+    if(allShiftRandomStep==0){  //setup
+      allShiftRandomStep=1;
+      fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1
+    }
+    if(allShiftRandomStep==1){  //setup    
+      allShiftOnce();
+    }
   }
 }
 
@@ -53,6 +59,7 @@ void fadeUpBack(){  //randomly fades all leds to full brightness and then choose
         if(fadeUp()==1){
           fadeUpBackStep=2;
         }
+        //fadeUp();
       }
       if(fadeUpBackStep==2){
         if(fadeBack()==1){
@@ -70,34 +77,37 @@ void allShiftRandom(){  //fades all leds up to a random color and then shifts th
       if(allShiftRandomStep==0){  //setup
         programControl=1;  //this takes control of the program from the main script
         allShiftRandomStep=1;
+        allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift used only by the allShiftRandom add-on
+        fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1        
       }
       if(allShiftRandomStep<=allShiftRandomIterations){
-        allShiftOnce();
+        if(allShiftOnce()==1){
+          allShiftRandomStep=allShiftRandomStep+1;
+        }
       }
       if(allShiftRandomStep>allShiftRandomIterations){  //finish the allShiftRandom
-        //if(fadeBack()==1){
+        if(fadeBack()==1){
           allShiftRandomNextTime=millis()+random(allShiftRandomDelayMin,allShiftRandomDelayMax)+fadeDelay;
           allShiftRandomStep=0;  //reset for next time
-        //}    
+        }    
       }
     }
   }
 }
 
 //script components:
-void allShiftOnce(){
+byte allShiftOnce(){
   if(millis()>= program[0][1] && millis()>= program[3][1]){  //check if the fade is complete
-    if(allShiftRandomStep==0){  //setup
-      allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift used only by the allShiftRandom add-on
-      fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1
-    }
     newColor(2);  //set new color for position 2
     for(byte i=0;i<=2;i++){  //copy over the new program from position 2 to position 1
       for(byte j=0;j<=1;j++){
         program[i][j]=program[i+3][j];
       }
     }  
-    allShiftRandomStep=allShiftRandomStep+1;
+    return 1;
+  }
+  else{
+    return 0;
   }
 }
 
@@ -134,8 +144,12 @@ byte fadeUp(){  //set the target brightness to 255 for all leds and the fade end
       program[b][1] = millis()+fadeDelay;  //set fade end time
       program[b][3] = millis();  //set last brightness change time
     }
+    //fadeUpBackStep=2;
     return 1;
   } 
+  else{
+    return 0;
+  }
 }
 
 byte fadeBack(){  //this picks new positions and a new color and fades one position to the new color and the other to 0
@@ -149,9 +163,12 @@ byte fadeBack(){  //this picks new positions and a new color and fades one posit
     programControl=0;  //give the program control back to the main script
     standardStep=1;  //next step is the crossfade
     digitalWrite(10, LOW);  //for debugging
-    fadeUpBackStep=0;  //fadeUpBack is no longer in action
+    //fadeUpBackStep=0;  //fadeUpBack is no longer in action
     return 1;  //this lets the script know that the fadeback has been programmed
-  } 
+  }
+  else{
+    return 0;
+  }
 }
 
 void strobeOn(){

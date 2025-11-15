@@ -151,7 +151,7 @@ fader();  //the fader function changes brightness values to reach the target bri
 fader();  //I think more calls to the fader might make for smoother fades, the script() function doesn't need to update anywhere near as frequently
 //interruptLoadCheck()  //for debugging
 //sramCheck();  //for debugging
-//debugBlink();  //for debugging
+debugBlink();  //for debugging
 //millisBlink();  //for debugging
 }
 
