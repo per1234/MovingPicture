@@ -27,12 +27,12 @@ const byte allShiftRandomMax=3;  //the maximum number of allShifts it will conse
 const byte offLevel=3;  //with 256 brightness levels the jump from 0 to 1 is too dramatic and makes it blinky, with more brightness levels this could change
 
 void script(){
-  standard();  //works
   //fadeUpBack();  //locks up
   //allShiftRandom();  //locks up
   //strobeMain();  //works
   //strobe();  //works
   //allShift();  //works
+  standard();  //works
 }
 
 /*

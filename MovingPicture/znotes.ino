@@ -29,6 +29,7 @@
   -fadeUpBack locks up
   -allShiftRandom locks up
   -brightness fluctuations
+  -standard doesn't appear to be doing the colorShift, only crossfade
   
 -maybe
   -create a stripped down version of the softPWM library and see if it will change memory usage
@@ -46,4 +47,5 @@
   all unused script setup variables
   all unused scripts - check to see if unused functions increase the size
   all unused script components
+  softPWM library
 */

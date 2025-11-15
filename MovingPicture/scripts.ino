@@ -44,7 +44,7 @@ void strobe(){  //randomly turns all leds on full and then back to the previous 
 
 void fadeUpBack(){  //randomly fades all leds to full brightness and then chooses new positions and a new color and fades one position to the new color and the other to 0 and then sends it back to the crossfade
   if(programControl==0 || fadeUpBackStep>0){  //check if the main program has control, don't want to activate if another add-on has control
-    if(millis()>=fadeUpBackNextTime){
+    if(millis()>=fadeUpBackNextTime && standardStep==1){  //start after the color shift on the standard script
       programControl=1;  //this takes control of the program from the main script
       if(fadeUpBackStep==0){  //crossfade position 1 to position2
         fadeUp();
@@ -58,7 +58,7 @@ void fadeUpBack(){  //randomly fades all leds to full brightness and then choose
 
 void allShiftRandom(){  //fades all leds up to a random color and then shifts the color of all leds a random number of times, then picks new positions and new colors for position 1 and fades to the color on position 1 and to 0 on position 2 and then goes to crossfade
   if(programControl==0 || allShiftRandomStep>0){  //check if the main program has control, don't want to activate if another add-on has control
-    if(millis()>=allShiftRandomNextTime){  //check if it's time for an AllShiftRandom
+    if(millis()>=allShiftRandomNextTime && standardStep==1){  //check if it's time for an AllShiftRandom and it is ready for a crossfade
       programControl=1;  //this takes control of the program from the main script
       if(allShiftRandomStep<=allShiftRandomIterations){
         allShiftOnce();
@@ -74,21 +74,19 @@ void allShiftRandom(){  //fades all leds up to a random color and then shifts th
 
 //script components:
 void allShiftOnce(){
-  if(standardStep==1){ //it is ready for a crossfade
-    if(millis()>= program[0][1]){  //check if the fade is complete
-      if(allShiftRandomStep==0){  //setup
-        allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift
-        fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1
-      }
-      newColor(2);  //set new color for position 2
-      for(byte i=0;i<=2;i++){  //copy over the new program from position 2 to position 1
-        for(byte j=0;j<=1;j++){
-          program[i][j]=program[i+3][j];
-        }
-      }  
-      allShiftRandomStep=allShiftRandomStep+1;
+  if(millis()>= program[0][1]){  //check if the fade is complete
+    if(allShiftRandomStep==0){  //setup
+      allShiftRandomIterations=random(1,allShiftRandomMax+1);  //decide how many times to allShift
+      fillAllPos2();  //position 2 gets all the RGBLEDs not already in position 1
     }
-  }  
+    newColor(2);  //set new color for position 2
+    for(byte i=0;i<=2;i++){  //copy over the new program from position 2 to position 1
+      for(byte j=0;j<=1;j++){
+        program[i][j]=program[i+3][j];
+      }
+    }  
+    allShiftRandomStep=allShiftRandomStep+1;
+  }
 }
 
 void colorShift(){
@@ -114,18 +112,16 @@ void crossFade(){
 }
 
 void fadeUp(){  //set the target brightness to 255 for all leds and the fade end time to a random length of time
-  if(standardStep==1){  //start after the color shift on the standard script
-    if(millis()>= program[0][1]){  //check if the fade is complete
-      pos1equalsPos2();
-      fillAllPos2();  //make sure all RGBLEDs are in position 1 or position 2
-      fadeDelay=random(fadeDelayMin,fadeDelayMax);  //pick a length of time for the fadeUp
-      for(byte b=0;b<=5;b++){  //step through the program rows
-        program[b][0] = SoftPWM.brightnessLevels()-1;  //set target brightness
-        program[b][1] = millis()+fadeDelay;  //set fade end time
-      }
-      fadeUpBackStep=1;
-    } 
-  }
+  if(millis()>= program[0][1]){  //check if the fade is complete
+    //pos1equalsPos2();
+    fillAllPos2();  //make sure all RGBLEDs are in position 1 or position 2
+    fadeDelay=random(fadeDelayMin,fadeDelayMax);  //pick a length of time for the fadeUp
+    for(byte b=0;b<=5;b++){  //step through the program rows
+      program[b][0] = SoftPWM.brightnessLevels()-1;  //set target brightness
+      program[b][1] = millis()+fadeDelay;  //set fade end time
+    }
+    fadeUpBackStep=1;
+  } 
 }
 
 void fadeBack(){  //this picks new positions and a new color and fades one position to the new color and the other to 0
