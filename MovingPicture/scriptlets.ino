@@ -153,7 +153,7 @@ void fadeBack(){  //this picks new positions and a new color and fades one posit
 void strobeOn(){  //this needs to save the program array in a different array and then set the program to full on and then after the strobeTime set it back to the original program array with strobeTime added to all end and last times in the array
   if(millis()>=strobeNextTime){  //turn on the strobe
     for(byte i=0;i<=5;i++){    //step through the RGB for position 1 and 2
-      lastTargetBrightness[i]=program[i][0];  //save the current program - I only need to save target brightness for the 6 rows
+      lastTargetBrightness[i]=program[i][0];  //save the current program - I only need to save target brightness for the 6 rows - this could also be done by having a fader disable flag instead of the lastTargetBrightness array
       //Serial.println(program[i][0]);
       program[i][0]=program[i][2];  //set the target brightness to the current brightness so the fader will not change brightness while the strobe is on
     }

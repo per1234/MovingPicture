@@ -8,8 +8,7 @@ void setup(){
   randomSeed(analogRead(0));  //makes the pseudorandom number sequence start at a different position each boot - this needs a more random input
   //Serial.begin(9600);  //for debugging
   SoftPWM.begin(120);  //start the SoftPWM and set the PWM frequency
-  for(byte softPWMchannel=0;softPWMchannel<=SoftPWM.size();softPWMchannel++){  //cycle through all the softPWM channels
-      SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
+  for(byte softPWMchannel=0;softPWMchannel<=SoftPWM.size();softPWMchannel++){  //cycle through all the softPWM channels      SoftPWM.set(softPWMchannel, offLevel);  //turn on all pins at brightness 1 - there is a big jump from 0 to 1 so I have decided to always have every led slightly on
   }
   //I'm setting these variables up here because the randomSeed(analogRead(0)) doesn't work at the top of the sketch where I'm declaring variables for some reason and I need to do the randomSeed(analogRead(0)) before picking random variables
   fadeDelayMax=random(fadeDelayMinSet + fadeDelayDiffMin, fadeDelayMaxSet);  //the maximum bound of the rendomly chosen length of time that the fade will occur over
@@ -118,39 +117,30 @@ void fillAllPos2(){
   }
 }
 
-void fader(){  //the current code only allows the fader to increment by 1 even if the program calls for faster, this seems like it enforces smooth fades over reaching the goal but will not work well for instant brightness changes, I have had trouble doing instant changes directly for some reason
+void fader(){  //the current code only allows the fader to increment by 1 even if the program calls for faster, this seems like it enforces smooth fades over reaching the goal but will not work well for instant brightness change
   for(byte i=0;i<=5;i++){  //cycle through the program rows
     if(program[i][0] != program[i][2] && millis()-program[i][3]>=(program[i][1]-program[i][3])/(abs(program[i][0]-program[i][2])+1)){  //no change needed if the start and end brightness are equal
-      if(program[i][0]-program[i][2]>0){  //check if it is a positive change
-        program[i][2]=program[i][2]+1;  //update the current brightness
-        if(i<3){  //change brightness of position 1
-          for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
-            SoftPWM.set(pos1[j]*3+i, program[i][2]);  //change the brightness 
-          }
-        }
-        if(i>=3){  //change brightness of position 2
-          for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
-            SoftPWM.set(pos2[j]*3+i-3, program[i][2]);  //change the brightness
-          }
+      if(program[i][0]>program[i][2]){  //check if it is a positive change
+        program[i][2]++;  //update the current brightness
+      }
+      if(program[i][0]<program[i][2]){  //check if it is a negative change
+        program[i][2]--; //update the current brightness
+      }
+      if(i<3){  //change brightness of position 1
+        for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
+          SoftPWM.set(pos1[j]*3+i, program[i][2]);  //change the brightness 
         }
       }
-      if(program[i][0]-program[i][2]<0){  //check if it is a negative change
-        program[i][2]=program[i][2]-1; //update the current brightness
-        if(i<3){  //change brightness of position 1
-          for(byte j=0;j<=pos1size;j++){  //cycle through the position rows to be perFaded
-            SoftPWM.set(pos1[j]*3+i, program[i][2]);  //change the brightness
-          }
-        }
-        if(i>=3){  //change brightness of position 2
-          for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
-            SoftPWM.set(pos2[j]*3+i-3, program[i][2]);  //change the brightness       
-          }
+      if(i>=3){  //change brightness of position 2
+        for(byte j=0;j<=pos2size;j++){  //cycle through the position rows to be perFaded
+          SoftPWM.set(pos2[j]*3+i-3, program[i][2]);  //change the brightness
         }
       }
       program[i][3]=millis();  //update the last brightness change time
     }
   }
 }
+
 
 void loop(){
 script(scriptID);  //the script function runs the collection of functions in the scriptID that is set in the current profile

@@ -22,7 +22,7 @@ SOFTPWM_DEFINE_CHANNEL_INVERT( 12, DDRC, PORTC, PORTC3 );  //A3
 SOFTPWM_DEFINE_CHANNEL_INVERT( 13, DDRC, PORTC, PORTC2 );  //A2
 SOFTPWM_DEFINE_CHANNEL_INVERT( 14, DDRC, PORTC, PORTC1 );  //A1
 SOFTPWM_DEFINE_OBJECT(15);  //15 softPWM channels
-const byte ledNum=5;  //still needed to size the pos1 and pos2 arrays
+const byte ledNum=5;  //still needed to size the pos1 and pos2 arrays but use SoftPWM.size() everywhere else
 
 //initialize global variables, none of these should need setup
 byte pos1[ledNum];  //The postition 1 array - this contains the numbers of the LEDs that make up the current pos1.
@@ -30,8 +30,8 @@ byte pos1size; //the current number of items in the pos1 array(zero indexed) - g
 byte pos2[ledNum];  //The postition 1 array - this contains the numbers of the LEDs that make up the current pos1.
 byte pos2size;  //the current number of items in the pos2 array(zero indexed) - get rid of the zero index thing too confusing
 int fadeDelay;  //the length of time that the fade will occur over, should be moved to the various functions that need it(crossfade, shift, etc.)
-long program[6][4];  //[pos1R, pos1G, pos1B, pos2R, pos2G, pos2B][target brightness, end time, current brightness, last brightness change time]
-long lastTargetBrightness[6];  //used to store the previous target brightness values from the program[] array in the strobe function
+long program[6][4];  //[pos1R, pos1G, pos1B, pos2R, pos2G, pos2B][target brightness, end time, current brightness, last brightness change time] - can't be unsigned because the fader equation needs negative numbers
+byte lastTargetBrightness[6];  //used to store the previous target brightness values from the program[] array in the strobe function
 int fadeDelayMax;  //this is randomly set in the initialize function
 int fadeDelayMin;  //this is randomly set in the initialize function
 int valueTotalMin;  //this is randomly set in the initialize function
